@@ -2,12 +2,21 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SlideData, SlideType, Item, Hamper } from "@/types/presentation";
-import { DefaultItemDataSource } from "@/data/defaultItems";
+import { defaultDataSource } from "@/data/defaultItems";
 import { Search } from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface SlideFormProps {
   slide: SlideData;
@@ -18,7 +27,8 @@ export const SlideForm = ({ slide, onUpdate }: SlideFormProps) => {
   const [availableItems, setAvailableItems] = useState<Item[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredItems, setFilteredItems] = useState<Item[]>([]);
-  const dataSource = new DefaultItemDataSource();
+  const [open, setOpen] = useState(false);
+  const dataSource = defaultDataSource;
 
   useEffect(() => {
     loadItems();
@@ -58,6 +68,7 @@ export const SlideForm = ({ slide, onUpdate }: SlideFormProps) => {
     const selectedItem = availableItems.find(item => item.id === itemId);
     if (selectedItem) {
       onUpdate({ content: selectedItem });
+      setOpen(false);
     }
   };
 
@@ -80,6 +91,8 @@ export const SlideForm = ({ slide, onUpdate }: SlideFormProps) => {
     return hamper.items.some(item => item.id === itemId);
   };
 
+  const selectedItem = slide.type === 'item' ? availableItems.find(item => item.id === (slide.content as Item).id) : null;
+
   return (
     <Card className="p-6 space-y-6">
       {/* Slide Type Selection */}
@@ -96,49 +109,68 @@ export const SlideForm = ({ slide, onUpdate }: SlideFormProps) => {
         </Select>
       </div>
 
-      {/* Search Bar */}
-      <div className="space-y-2">
-        <Label className="text-sm font-medium">Search Items</Label>
-        <div className="relative">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search items..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-      </div>
-
       {/* Item Selection */}
       {slide.type === 'item' ? (
         <div className="space-y-2">
           <Label className="text-sm font-medium">Select Item</Label>
-          <Select 
-            value={(slide.content as Item).id} 
-            onValueChange={handleItemSelect}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Choose an item..." />
-            </SelectTrigger>
-            <SelectContent className="max-h-60">
-              {filteredItems.map((item) => (
-                <SelectItem key={item.id} value={item.id}>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={open}
+                className="w-full justify-between"
+              >
+                {selectedItem ? (
                   <div className="flex items-center space-x-2">
                     <img 
-                      src={item.imageUrl} 
-                      alt={item.name}
+                      src={selectedItem.imageUrl} 
+                      alt={selectedItem.name}
                       className="w-6 h-6 rounded object-cover"
                     />
-                    <span>{item.name}</span>
-                    <span className="text-muted-foreground">
-                      ${item.price.toFixed(2)}
-                    </span>
+                    <span>{selectedItem.name}</span>
                   </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                ) : (
+                  "Select an item..."
+                )}
+                <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[350px] p-0">
+              <Command>
+                <CommandInput 
+                  placeholder="Search items..." 
+                  value={searchQuery}
+                  onValueChange={setSearchQuery}
+                />
+                <CommandList>
+                  <CommandEmpty>No items found.</CommandEmpty>
+                  <CommandGroup>
+                    {filteredItems.map((item) => (
+                      <CommandItem
+                        key={item.id}
+                        value={item.id}
+                        onSelect={handleItemSelect}
+                        className="flex items-center space-x-2 py-2"
+                      >
+                        <img 
+                          src={item.imageUrl} 
+                          alt={item.name}
+                          className="w-8 h-8 rounded object-cover flex-shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="truncate">{item.name}</div>
+                          <div className="text-sm text-muted-foreground">
+                            ${item.price.toFixed(2)}
+                          </div>
+                        </div>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
       ) : (
         <div className="space-y-3">

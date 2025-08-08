@@ -1,18 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SlideData, Presentation, SlideType, Item, Hamper } from "@/types/presentation";
-import { defaultItems } from "@/data/defaultItems";
+import { defaultDataSource } from "@/data/defaultItems";
 
 export const usePresentation = () => {
   const [presentation, setPresentation] = useState<Presentation>({
     slides: [],
     activeSlideId: null,
   });
+  const [defaultItem, setDefaultItem] = useState<Item>({ id: '', name: '', price: 0, imageUrl: '' });
+
+  useEffect(() => {
+    // Load initial item on mount
+    defaultDataSource.getItems().then(items => {
+      if (items.length > 0) {
+        setDefaultItem(items[0]);
+      }
+    });
+  }, []);
 
   const addSlide = () => {
     const newSlide: SlideData = {
       id: Date.now().toString(),
       type: 'item',
-      content: defaultItems[0] || { id: '', name: '', price: 0, imageUrl: '' },
+      content: defaultItem,
       createdAt: new Date(),
     };
 
