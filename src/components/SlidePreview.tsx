@@ -6,6 +6,7 @@ import { SlideCard } from "./SlideCard";
 import { Download, FileDown } from "lucide-react";
 import { generatePDF } from "@/utils/pdfGenerator";
 import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 interface SlidePreviewProps {
   slides: SlideData[];
@@ -22,6 +23,7 @@ export const SlidePreview = ({
 }: SlidePreviewProps) => {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("slide"); // "slide" or "presentation"
 
   const handleDownloadPDF = async () => {
     if (slides.length === 0) {
@@ -55,94 +57,85 @@ export const SlidePreview = ({
   return (
     <div className="h-full bg-presentation-surface overflow-y-auto">
       <div className="p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            Live Preview
-          </h2>
-          <Button 
-            onClick={handleDownloadPDF}
-            disabled={slides.length === 0 || isGeneratingPdf}
-            className="bg-gradient-accent hover:opacity-90 transition-opacity"
-          >
-            {isGeneratingPdf ? (
-              <FileDown className="w-4 h-4 mr-2 animate-pulse" />
-            ) : (
-              <Download className="w-4 h-4 mr-2" />
-            )}
-            {isGeneratingPdf ? "Generating..." : "Download PDF"}
-          </Button>
-        </div>
-
-        {/* Active Slide Preview */}
-        {activeSlideId && slides.length > 0 && (
-          <div className="space-y-4">
-            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-              Current Slide
-            </h3>
-            <Card className="p-6 shadow-slide">
-              <SlideCard 
-                slide={slides.find(s => s.id === activeSlideId)!}
-                isActive={true}
-                isPreview={true}
-                onClick={() => {}}
-                onDelete={onDeleteSlide}
-              />
-            </Card>
-          </div>
-        )}
-
-        {/* All Slides */}
+        {/* Header with Tabs */}
         <div className="space-y-4">
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-            All Slides ({slides.length})
-          </h3>
-          
-          {slides.length === 0 ? (
-            <Card className="p-12 text-center">
-              <div className="space-y-3">
-                <FileDown className="w-12 h-12 mx-auto text-muted-foreground" />
-                <div>
-                  <p className="text-lg font-medium">No slides yet</p>
-                  <p className="text-sm text-muted-foreground">
-                    Create your first slide to see the preview here
-                  </p>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              Preview
+            </h2>
+          </div>
+          <Tabs defaultValue="slide" value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-muted/20">
+              <TabsTrigger 
+                value="slide" 
+                className="data-[state=active]:bg-gradient-primary data-[state=active]:text-white"
+              >
+                Slide
+              </TabsTrigger>
+              <TabsTrigger 
+                value="presentation"
+                className="data-[state=active]:bg-gradient-primary data-[state=active]:text-white"
+              >
+                Presentation
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Slide Preview Tab */}
+            <TabsContent value="slide" className="mt-6">
+              {activeSlideId && slides.length > 0 ? (
+                <Card className="p-6 shadow-slide">
+                  <SlideCard 
+                    slide={slides.find(s => s.id === activeSlideId)!}
+                    isActive={true}
+                    isPreview={true}
+                    onClick={() => {}}
+                    onDelete={onDeleteSlide}
+                  />
+                </Card>
+              ) : (
+                <div className="text-center text-muted-foreground p-8">
+                  No slide selected or available
                 </div>
-              </div>
-            </Card>
-          ) : (
-            <div className="grid gap-4">
-              {slides.map((slide, index) => (
-                <Card 
-                  key={slide.id} 
-                  className="p-4 hover:shadow-soft transition-shadow cursor-pointer"
-                  onClick={() => onSelectSlide(slide.id)}
+              )}
+            </TabsContent>
+
+            {/* Presentation Preview Tab */}
+            <TabsContent value="presentation" className="mt-6 space-y-6">
+              <div className="flex justify-end">
+                <Button 
+                  onClick={handleDownloadPDF}
+                  disabled={slides.length === 0 || isGeneratingPdf}
+                  className="bg-gradient-accent hover:opacity-90 transition-opacity"
                 >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-muted-foreground">
-                        Slide {index + 1}
-                      </span>
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                        slide.type === 'item' 
-                          ? 'bg-presentation-primary/10 text-presentation-primary' 
-                          : 'bg-presentation-accent/10 text-presentation-accent'
-                      }`}>
-                        {slide.type.charAt(0).toUpperCase() + slide.type.slice(1)}
-                      </span>
-                    </div>
-                    <SlideCard 
+                  {isGeneratingPdf ? (
+                    <FileDown className="w-4 h-4 mr-2 animate-pulse" />
+                  ) : (
+                    <Download className="w-4 h-4 mr-2" />
+                  )}
+                  {isGeneratingPdf ? "Generating..." : "Download PDF"}
+                </Button>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-6">
+                {slides.map((slide) => (
+                  <Card key={slide.id} className="p-6 shadow-slide">
+                    <SlideCard
                       slide={slide}
-                      isActive={activeSlideId === slide.id}
-                      isPreview={false}
+                      isActive={slide.id === activeSlideId}
+                      isPreview={true}
                       onClick={() => onSelectSlide(slide.id)}
                       onDelete={onDeleteSlide}
                     />
+                  </Card>
+                ))}
+                {slides.length === 0 && (
+                  <div className="text-center text-muted-foreground p-8">
+                    No slides available
                   </div>
-                </Card>
-              ))}
-            </div>
-          )}
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
