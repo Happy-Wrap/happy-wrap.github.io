@@ -1,0 +1,233 @@
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { SlideData, Item, Hamper } from '@/types/presentation';
+import logoImage from '@/assets/logo.png';
+
+export const generatePDF = async (slides: SlideData[]): Promise<void> => {
+  const pdf = new jsPDF({
+    orientation: 'landscape',
+    unit: 'mm',
+    format: 'a4'
+  });
+
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 20;
+
+  for (let i = 0; i < slides.length; i++) {
+    const slide = slides[i];
+    
+    if (i > 0) {
+      pdf.addPage();
+    }
+
+    // Add company logo
+    try {
+      // Create a temporary image element to get logo dimensions
+      const img = new Image();
+      img.src = logoImage;
+      await new Promise((resolve) => {
+        img.onload = resolve;
+      });
+      
+      const logoWidth = 30;
+      const logoHeight = (img.height / img.width) * logoWidth;
+      pdf.addImage(logoImage, 'PNG', margin, margin, logoWidth, logoHeight);
+    } catch (error) {
+      console.warn('Could not add logo to PDF:', error);
+    }
+
+    // Add slide content
+    if (slide.type === 'item') {
+      await renderItemSlide(pdf, slide.content as Item, pageWidth, pageHeight, margin);
+    } else {
+      await renderHamperSlide(pdf, slide.content as Hamper, pageWidth, pageHeight, margin);
+    }
+
+    // Add footer
+    pdf.setFontSize(10);
+    pdf.setTextColor(128, 128, 128);
+    pdf.text(
+      'PresentPro Solutions • www.presentpro.com',
+      pageWidth / 2,
+      pageHeight - margin,
+      { align: 'center' }
+    );
+
+    // Add slide number
+    pdf.text(
+      `Slide ${i + 1} of ${slides.length}`,
+      pageWidth - margin,
+      pageHeight - margin,
+      { align: 'right' }
+    );
+  }
+
+  // Save the PDF
+  pdf.save('presentation.pdf');
+};
+
+const renderItemSlide = async (
+  pdf: jsPDF, 
+  item: Item, 
+  pageWidth: number, 
+  pageHeight: number, 
+  margin: number
+): Promise<void> => {
+  const centerX = pageWidth / 2;
+  const centerY = pageHeight / 2;
+
+  // Item name
+  pdf.setFontSize(24);
+  pdf.setTextColor(0, 0, 0);
+  pdf.text(item.name, centerX, margin + 40, { align: 'center' });
+
+  // Item image
+  try {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = item.imageUrl;
+    
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+    });
+
+    const maxImageWidth = 100;
+    const maxImageHeight = 80;
+    const imageRatio = img.width / img.height;
+    
+    let imageWidth = maxImageWidth;
+    let imageHeight = maxImageWidth / imageRatio;
+    
+    if (imageHeight > maxImageHeight) {
+      imageHeight = maxImageHeight;
+      imageWidth = maxImageHeight * imageRatio;
+    }
+
+    const imageX = centerX - imageWidth / 2;
+    const imageY = centerY - imageHeight / 2;
+
+    pdf.addImage(img, 'JPEG', imageX, imageY, imageWidth, imageHeight);
+  } catch (error) {
+    console.warn('Could not add item image to PDF:', error);
+    // Add placeholder text
+    pdf.setFontSize(12);
+    pdf.setTextColor(128, 128, 128);
+    pdf.text('[Image not available]', centerX, centerY, { align: 'center' });
+  }
+
+  // Item price
+  pdf.setFontSize(28);
+  pdf.setTextColor(102, 51, 153); // Purple color
+  pdf.text(`$${item.price.toFixed(2)}`, centerX, pageHeight - margin - 40, { align: 'center' });
+};
+
+const renderHamperSlide = async (
+  pdf: jsPDF, 
+  hamper: Hamper, 
+  pageWidth: number, 
+  pageHeight: number, 
+  margin: number
+): Promise<void> => {
+  const centerX = pageWidth / 2;
+  let currentY = margin + 40;
+
+  // Hamper title
+  pdf.setFontSize(24);
+  pdf.setTextColor(0, 0, 0);
+  pdf.text('Product Hamper', centerX, currentY, { align: 'center' });
+  currentY += 20;
+
+  // Item names
+  pdf.setFontSize(14);
+  hamper.items.forEach((item, index) => {
+    const text = index < hamper.items.length - 1 ? `${item.name} •` : item.name;
+    const textWidth = pdf.getTextWidth(text);
+    
+    if (index === 0) {
+      // Center the first item
+      const totalWidth = hamper.items.reduce((sum, item, i) => {
+        const itemText = i < hamper.items.length - 1 ? `${item.name} • ` : item.name;
+        return sum + pdf.getTextWidth(itemText);
+      }, 0);
+      currentY += 10;
+      pdf.text(text, centerX - totalWidth / 2, currentY);
+    } else {
+      // Continue on the same line
+      const previousTexts = hamper.items.slice(0, index).reduce((sum, item, i) => {
+        const itemText = i < hamper.items.length - 1 ? `${item.name} • ` : item.name;
+        return sum + pdf.getTextWidth(itemText);
+      }, 0);
+      
+      const totalWidth = hamper.items.reduce((sum, item, i) => {
+        const itemText = i < hamper.items.length - 1 ? `${item.name} • ` : item.name;
+        return sum + pdf.getTextWidth(itemText);
+      }, 0);
+      
+      pdf.text(text, centerX - totalWidth / 2 + previousTexts, currentY);
+    }
+  });
+
+  currentY += 30;
+
+  // Item images - render them horizontally like in the preview
+  if (hamper.items.length > 0) {
+    const imageSize = 25; // Size in mm
+    const spacing = 5; // Spacing between images
+    const totalWidth = (hamper.items.length * imageSize) + ((hamper.items.length - 1) * spacing);
+    const startX = centerX - totalWidth / 2;
+
+    for (let i = 0; i < hamper.items.length; i++) {
+      const item = hamper.items[i];
+      const imageX = startX + (i * (imageSize + spacing));
+
+      try {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = item.imageUrl;
+        
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+        });
+
+        pdf.addImage(img, 'JPEG', imageX, currentY, imageSize, imageSize);
+      } catch (error) {
+        console.warn(`Could not add hamper item image for ${item.name}:`, error);
+        // Add placeholder rectangle
+        pdf.setDrawColor(200, 200, 200);
+        pdf.setFillColor(240, 240, 240);
+        pdf.rect(imageX, currentY, imageSize, imageSize, 'FD');
+        
+        // Add item initial in the center
+        pdf.setFontSize(8);
+        pdf.setTextColor(128, 128, 128);
+        pdf.text(
+          item.name.charAt(0).toUpperCase(), 
+          imageX + imageSize / 2, 
+          currentY + imageSize / 2 + 2, 
+          { align: 'center' }
+        );
+      }
+    }
+    
+    currentY += imageSize + 15;
+  } else {
+    // No items message
+    pdf.setFontSize(12);
+    pdf.setTextColor(128, 128, 128);
+    pdf.text('No items in hamper', centerX, currentY, { align: 'center' });
+    currentY += 20;
+  }
+
+  // Total price
+  const totalPrice = hamper.items.reduce((sum, item) => sum + item.price, 0);
+  pdf.setFontSize(16);
+  pdf.setTextColor(128, 128, 128);
+  pdf.text('Total Value', centerX, pageHeight - margin - 50, { align: 'center' });
+  
+  pdf.setFontSize(28);
+  pdf.setTextColor(102, 51, 153); // Purple color
+  pdf.text(`$${totalPrice.toFixed(2)}`, centerX, pageHeight - margin - 30, { align: 'center' });
+};
