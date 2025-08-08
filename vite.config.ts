@@ -5,7 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: '/happywrap.github.io/',
+  base: 'https:/happy-wrap.github.io/',
   server: {
     host: "::",
     port: 8080,
