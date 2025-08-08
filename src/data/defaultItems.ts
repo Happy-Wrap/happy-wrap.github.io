@@ -68,11 +68,20 @@ export class GoogleSheetsDataSource implements ItemDataSource {
   }
 
   private mapRowToItem(row: any[], headerIdx: HeaderIndex): Item {
+    const imageUrl = row[headerIdx['Image URL']] || '';
+    const driveUrlPattern = /^@https:\/\/drive\.google\.com\/file\/d\/([^/]+)\/view*$/;
+    const match = imageUrl.match(driveUrlPattern);
+    const simpleMatch = imageUrl.match(/\/d\/([^/]+)\/view/);
+    const fileId = simpleMatch ? simpleMatch[1] : null;
+    const processedImageUrl = fileId 
+      ? `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`
+      : imageUrl || 'https://via.placeholder.com/500';
+    console.log(row[headerIdx['Product Name']], imageUrl, match, fileId, processedImageUrl);
     return {
       id: row[headerIdx['ID']] || String(Math.random()),
       name: row[headerIdx['Product Name']] || '',
       price: parseFloat(row[headerIdx['MRP']] || '0'),
-      imageUrl: row[headerIdx['Image URL']] || 'https://via.placeholder.com/500',
+      imageUrl: processedImageUrl,
     };
   }
 
