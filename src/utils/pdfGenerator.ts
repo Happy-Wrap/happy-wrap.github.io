@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { SlideData, Item, Hamper } from '@/types/presentation';
+import { SlideData, Item, Hamper, TemplateSlide } from '@/types/presentation';
 import logoImage from '@/assets/logo.png';
 
 export const generatePDF = async (slides: SlideData[]): Promise<void> => {
@@ -21,40 +21,68 @@ export const generatePDF = async (slides: SlideData[]): Promise<void> => {
       pdf.addPage();
     }
 
-    // Add company logo
-    try {
-      // Create a temporary image element to get logo dimensions
-      const img = new Image();
-      img.src = logoImage;
-      await new Promise((resolve) => {
-        img.onload = resolve;
-      });
-      
-      const logoWidth = 30;
-      const logoHeight = (img.height / img.width) * logoWidth;
-      pdf.addImage(logoImage, 'PNG', margin, margin, logoWidth, logoHeight);
-    } catch (error) {
-      console.warn('Could not add logo to PDF:', error);
-    }
+    // Add slide content based on type
+    if (slide.type === 'template') {
+      await renderTemplateSlide(pdf, slide.content as TemplateSlide, pageWidth, pageHeight);
+    } else if (slide.type === 'item') {
+      // Add company logo for non-template slides
+      try {
+        const img = new Image();
+        img.src = logoImage;
+        await new Promise((resolve) => {
+          img.onload = resolve;
+        });
+        
+        const logoWidth = 30;
+        const logoHeight = (img.height / img.width) * logoWidth;
+        pdf.addImage(logoImage, 'PNG', margin, margin, logoWidth, logoHeight);
+      } catch (error) {
+        console.warn('Could not add logo to PDF:', error);
+      }
 
-    // Add slide content
-    if (slide.type === 'item') {
       await renderItemSlide(pdf, slide.content as Item, pageWidth, pageHeight, margin);
-    } else {
-      await renderHamperSlide(pdf, slide.content as Hamper, pageWidth, pageHeight, margin);
-    }
 
-    // Add footer
-    pdf.setFontSize(10);
-    pdf.setTextColor(128, 128, 128);
-    pdf.text(
-      'PresentPro Solutions • www.presentpro.com',
-      pageWidth / 2,
-      pageHeight - margin,
-      { align: 'center' }
-    );
+      // Add footer for non-template slides
+      pdf.setFontSize(10);
+      pdf.setTextColor(128, 128, 128);
+      pdf.text(
+        'PresentPro Solutions • www.presentpro.com',
+        pageWidth / 2,
+        pageHeight - margin,
+        { align: 'center' }
+      );
+    } else {
+      // Add company logo for non-template slides
+      try {
+        const img = new Image();
+        img.src = logoImage;
+        await new Promise((resolve) => {
+          img.onload = resolve;
+        });
+        
+        const logoWidth = 30;
+        const logoHeight = (img.height / img.width) * logoWidth;
+        pdf.addImage(logoImage, 'PNG', margin, margin, logoWidth, logoHeight);
+      } catch (error) {
+        console.warn('Could not add logo to PDF:', error);
+      }
+
+      await renderHamperSlide(pdf, slide.content as Hamper, pageWidth, pageHeight, margin);
+
+      // Add footer for non-template slides
+      pdf.setFontSize(10);
+      pdf.setTextColor(128, 128, 128);
+      pdf.text(
+        'PresentPro Solutions • www.presentpro.com',
+        pageWidth / 2,
+        pageHeight - margin,
+        { align: 'center' }
+      );
+    }
 
     // Add slide number
+    pdf.setFontSize(10);
+    pdf.setTextColor(128, 128, 128);
     pdf.text(
       `Slide ${i + 1} of ${slides.length}`,
       pageWidth - margin,
@@ -65,6 +93,50 @@ export const generatePDF = async (slides: SlideData[]): Promise<void> => {
 
   // Save the PDF
   pdf.save('presentation.pdf');
+};
+
+const renderTemplateSlide = async (
+  pdf: jsPDF,
+  template: TemplateSlide,
+  pageWidth: number,
+  pageHeight: number
+): Promise<void> => {
+  try {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = template.imageUrl;
+    
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+    });
+
+    // Calculate dimensions to fit the image while maintaining aspect ratio
+    const imageRatio = img.width / img.height;
+    const pageRatio = pageWidth / pageHeight;
+    
+    let finalWidth = pageWidth;
+    let finalHeight = pageHeight;
+    
+    if (imageRatio > pageRatio) {
+      // Image is wider than the page ratio
+      finalHeight = pageWidth / imageRatio;
+    } else {
+      // Image is taller than the page ratio
+      finalWidth = pageHeight * imageRatio;
+    }
+    
+    const x = (pageWidth - finalWidth) / 2;
+    const y = (pageHeight - finalHeight) / 2;
+    
+    pdf.addImage(img, 'JPEG', x, y, finalWidth, finalHeight);
+  } catch (error) {
+    console.warn('Could not add template image to PDF:', error);
+    // Add error message
+    pdf.setFontSize(14);
+    pdf.setTextColor(128, 128, 128);
+    pdf.text('Template image could not be loaded', pageWidth / 2, pageHeight / 2, { align: 'center' });
+  }
 };
 
 const renderItemSlide = async (

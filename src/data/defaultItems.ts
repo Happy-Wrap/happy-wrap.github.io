@@ -82,6 +82,9 @@ export class GoogleSheetsDataSource implements ItemDataSource {
       name: row[headerIdx['Product Name']] || '',
       price: parseFloat(row[headerIdx['MRP']] || '0'),
       imageUrl: processedImageUrl,
+      category: row[headerIdx['Category']] || '',
+      subCategory: row[headerIdx['Sub Category']] || '',
+      brand: row[headerIdx['Brand']] || '',
     };
   }
 

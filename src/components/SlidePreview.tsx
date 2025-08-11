@@ -7,6 +7,7 @@ import { Download, FileDown } from "lucide-react";
 import { generatePDF } from "@/utils/pdfGenerator";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { prefixTemplateSlides, suffixTemplateSlides } from "@/data/templateSlides";
 
 interface SlidePreviewProps {
   slides: SlideData[];
@@ -26,7 +27,9 @@ export const SlidePreview = ({
   const [activeTab, setActiveTab] = useState("slide"); // "slide" or "presentation"
 
   const handleDownloadPDF = async () => {
-    if (slides.length === 0) {
+    const allSlides = [...prefixTemplateSlides, ...slides, ...suffixTemplateSlides];
+    
+    if (allSlides.length === 0) {
       toast({
         title: "No slides to export",
         description: "Add some slides before downloading as PDF.",
@@ -37,7 +40,7 @@ export const SlidePreview = ({
 
     setIsGeneratingPdf(true);
     try {
-      await generatePDF(slides);
+      await generatePDF(allSlides);
       toast({
         title: "PDF Generated!",
         description: "Your presentation has been downloaded successfully.",
@@ -53,6 +56,11 @@ export const SlidePreview = ({
       setIsGeneratingPdf(false);
     }
   };
+
+  // Get the currently active slide for single slide preview
+  const activeSlide = activeSlideId 
+    ? [...prefixTemplateSlides, ...slides, ...suffixTemplateSlides].find(s => s.id === activeSlideId)
+    : null;
 
   return (
     <div className="h-full bg-presentation-surface overflow-y-auto">
@@ -82,10 +90,10 @@ export const SlidePreview = ({
 
             {/* Slide Preview Tab */}
             <TabsContent value="slide" className="mt-6">
-              {activeSlideId && slides.length > 0 ? (
+              {activeSlide ? (
                 <Card className="p-6 shadow-slide">
                   <SlideCard 
-                    slide={slides.find(s => s.id === activeSlideId)!}
+                    slide={activeSlide}
                     isActive={true}
                     isPreview={true}
                     onClick={() => {}}
@@ -115,25 +123,51 @@ export const SlidePreview = ({
                   {isGeneratingPdf ? "Generating..." : "Download PDF"}
                 </Button>
               </div>
-              
-              <div className="grid grid-cols-1 gap-6">
-                {slides.map((slide) => (
-                  <Card key={slide.id} className="p-6 shadow-slide">
-                    <SlideCard
-                      slide={slide}
-                      isActive={slide.id === activeSlideId}
-                      isPreview={true}
-                      onClick={() => onSelectSlide(slide.id)}
-                      onDelete={onDeleteSlide}
-                    />
-                  </Card>
-                ))}
-                {slides.length === 0 && (
-                  <div className="text-center text-muted-foreground p-8">
-                    No slides available
-                  </div>
-                )}
-              </div>
+
+              {/* Template Slides (Before) */}
+              {prefixTemplateSlides.map((slide) => (
+                <Card key={slide.id} className="p-6 shadow-slide h-[calc(9/16*100%)]">
+                  <SlideCard
+                    slide={slide}
+                    isActive={slide.id === activeSlideId}
+                    isPreview={true}
+                    onClick={() => onSelectSlide(slide.id)}
+                    onDelete={onDeleteSlide}
+                  />
+                </Card>
+              ))}
+
+              {/* User Created Slides */}
+              {slides.map((slide) => (
+                <Card key={slide.id} className="p-6 shadow-slide h-[calc(9/16*100%)]">
+                  <SlideCard
+                    slide={slide}
+                    isActive={slide.id === activeSlideId}
+                    isPreview={true}
+                    onClick={() => onSelectSlide(slide.id)}
+                    onDelete={onDeleteSlide}
+                  />
+                </Card>
+              ))}
+
+              {/* Template Slides (After) */}
+              {suffixTemplateSlides.map((slide) => (
+                <Card key={slide.id} className="p-6 shadow-slide h-[calc(9/16*100%)]">
+                  <SlideCard
+                    slide={slide}
+                    isActive={slide.id === activeSlideId}
+                    isPreview={true}
+                    onClick={() => onSelectSlide(slide.id)}
+                    onDelete={onDeleteSlide}
+                  />
+                </Card>
+              ))}
+
+              {slides.length === 0 && (
+                <div className="text-center text-muted-foreground p-8">
+                  No slides available. Start by adding some slides!
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>

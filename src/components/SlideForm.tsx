@@ -25,7 +25,6 @@ interface SlideFormProps {
 export const SlideForm = ({ slide, onUpdate }: SlideFormProps) => {
   const [availableItems, setAvailableItems] = useState<Item[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredItems, setFilteredItems] = useState<Item[]>([]);
   const [open, setOpen] = useState(false);
   const dataSource = defaultDataSource;
 
@@ -33,21 +32,9 @@ export const SlideForm = ({ slide, onUpdate }: SlideFormProps) => {
     loadItems();
   }, []);
 
-  useEffect(() => {
-    if (searchQuery) {
-      const filtered = availableItems.filter(item =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredItems(filtered);
-    } else {
-      setFilteredItems(availableItems);
-    }
-  }, [searchQuery, availableItems]);
-
   const loadItems = async () => {
     const items = await dataSource.getItems();
     setAvailableItems(items);
-    setFilteredItems(items);
   };
 
   const handleTypeChange = (newType: SlideType) => {
@@ -152,11 +139,13 @@ export const SlideForm = ({ slide, onUpdate }: SlideFormProps) => {
               <CommandList>
                 <CommandEmpty>No items found.</CommandEmpty>
                 <CommandGroup>
-                  {filteredItems.map((item) => (
+                  {availableItems.map((item) => {
+                    console.log('Item:', item, "");
+                    return (
                     <CommandItem
                       key={item.id}
-                      value={item.id}
-                      onSelect={handleItemSelect}
+                      value={`${item.name} ${item.brand} ${item.category} ${item.subCategory}`.trim()}
+                      onSelect={() => handleItemSelect(item.id)}
                       className="flex items-center space-x-2 py-2"
                     >
                       <img 
@@ -166,12 +155,13 @@ export const SlideForm = ({ slide, onUpdate }: SlideFormProps) => {
                       />
                       <div className="flex-1 min-w-0">
                         <div className="truncate">{item.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          ${item.price.toFixed(2)}
+                        <div className="text-sm text-muted-foreground flex flex-col">
+                          <span className="text-xs">{item.brand} • {item.category}</span>
+                          <span>${item.price.toFixed(2)}</span>
                         </div>
                       </div>
                     </CommandItem>
-                  ))}
+                  )})}
                 </CommandGroup>
               </CommandList>
             </Command>
