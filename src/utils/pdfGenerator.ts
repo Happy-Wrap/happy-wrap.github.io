@@ -7,7 +7,7 @@ export const generatePDF = async (slides: SlideData[]): Promise<void> => {
   const pdf = new jsPDF({
     orientation: 'landscape',
     unit: 'mm',
-    format: 'a4'
+    // format: 'a4'
   });
 
   const pageWidth = pdf.internal.pageSize.getWidth();
@@ -46,7 +46,7 @@ export const generatePDF = async (slides: SlideData[]): Promise<void> => {
       pdf.setFontSize(10);
       pdf.setTextColor(128, 128, 128);
       pdf.text(
-        'PresentPro Solutions • www.presentpro.com',
+        'HappyWrap • www.happywrap.in',
         pageWidth / 2,
         pageHeight - margin,
         { align: 'center' }
@@ -73,22 +73,12 @@ export const generatePDF = async (slides: SlideData[]): Promise<void> => {
       pdf.setFontSize(10);
       pdf.setTextColor(128, 128, 128);
       pdf.text(
-        'PresentPro Solutions • www.presentpro.com',
+        'HappyWrap • www.happywrap.in',
         pageWidth / 2,
         pageHeight - margin,
         { align: 'center' }
       );
     }
-
-    // Add slide number
-    pdf.setFontSize(10);
-    pdf.setTextColor(128, 128, 128);
-    pdf.text(
-      `Slide ${i + 1} of ${slides.length}`,
-      pageWidth - margin,
-      pageHeight - margin,
-      { align: 'right' }
-    );
   }
 
   // Save the PDF

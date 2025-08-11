@@ -122,7 +122,15 @@ export const SlideCard = ({
           />
         ) : (
           <div className="absolute inset-0 p-6">
-            {renderSlideContent()}
+            {/* Add background image for non-template slides */}
+            <img 
+              src="/assets/slides/option-template.png" 
+              alt="Slide Background"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="relative z-10">
+              {renderSlideContent()}
+            </div>
           </div>
         )}
 

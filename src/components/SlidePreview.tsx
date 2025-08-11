@@ -91,7 +91,7 @@ export const SlidePreview = ({
             {/* Slide Preview Tab */}
             <TabsContent value="slide" className="mt-6">
               {activeSlide ? (
-                <Card className="p-6 shadow-slide">
+                // <Card className="p-6 shadow-slide">
                   <SlideCard 
                     slide={activeSlide}
                     isActive={true}
@@ -99,7 +99,7 @@ export const SlidePreview = ({
                     onClick={() => {}}
                     onDelete={onDeleteSlide}
                   />
-                </Card>
+                // </Card>
               ) : (
                 <div className="text-center text-muted-foreground p-8">
                   No slide selected or available
@@ -126,15 +126,16 @@ export const SlidePreview = ({
 
               {/* Template Slides (Before) */}
               {prefixTemplateSlides.map((slide) => (
-                <Card key={slide.id} className="p-6 shadow-slide h-[calc(9/16*100%)]">
+                // <Card key={slide.id} className="p-6 shadow-slide h-[calc(9/16*100%)]">
                   <SlideCard
+                    key={slide.id} 
                     slide={slide}
                     isActive={slide.id === activeSlideId}
                     isPreview={true}
                     onClick={() => onSelectSlide(slide.id)}
                     onDelete={onDeleteSlide}
                   />
-                </Card>
+                // </Card>
               ))}
 
               {/* User Created Slides */}

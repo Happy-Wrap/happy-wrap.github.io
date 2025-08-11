@@ -6,7 +6,7 @@ export const prefixTemplateSlides: SlideData[] = [
     id: "template-welcome",
     type: "template",
     content: {
-      imageUrl: "/assets/slides/welcome.jpg"
+      imageUrl: "/assets/slides/welcome.png"
     },
     createdAt: new Date()
   },
@@ -14,7 +14,7 @@ export const prefixTemplateSlides: SlideData[] = [
     id: "template-whyus",
     type: "template",
     content: {
-      imageUrl: "/assets/slides/whyus.jpg"
+      imageUrl: "/assets/slides/whyus.png"
     },
     createdAt: new Date()
   },
@@ -22,7 +22,7 @@ export const prefixTemplateSlides: SlideData[] = [
     id: "template-topclients",
     type: "template",
     content: {
-      imageUrl: "/assets/slides/topclients.jpg"
+      imageUrl: "/assets/slides/topclients.png"
     },
     createdAt: new Date()
   },
@@ -30,7 +30,7 @@ export const prefixTemplateSlides: SlideData[] = [
     id: "template-steps",
     type: "template",
     content: {
-      imageUrl: "/assets/slides/steps.jpg"
+      imageUrl: "/assets/slides/steps.png"
     },
     createdAt: new Date()
   },
@@ -38,7 +38,7 @@ export const prefixTemplateSlides: SlideData[] = [
     id: "template-requirements",
     type: "template",
     content: {
-      imageUrl: "/assets/slides/requirements.jpg"
+      imageUrl: "/assets/slides/requirements.png"
     },
     createdAt: new Date()
   }
@@ -50,7 +50,7 @@ export const suffixTemplateSlides: SlideData[] = [
     id: "template-contactus",
     type: "template",
     content: {
-      imageUrl: "/assets/slides/contactus.jpg"
+      imageUrl: "/assets/slides/contactus.png"
     },
     createdAt: new Date()
   }
