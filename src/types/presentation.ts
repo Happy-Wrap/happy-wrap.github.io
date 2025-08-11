@@ -16,6 +16,7 @@ export interface Hamper {
 export interface TemplateSlide {
   imageUrl: string;
   isRequirementsSlide?: boolean;
+  details?: PresentationDetails;
 }
 
 export type SlideType = 'item' | 'hamper' | 'template';

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { SlideData, PresentationDetails } from "@/types/presentation";
+import { SlideData, PresentationDetails, TemplateSlide } from "@/types/presentation";
 import { SlideCard } from "./SlideCard";
 import { Download, FileDown } from "lucide-react";
 import { generatePDF } from "@/utils/pdfGenerator";
@@ -31,6 +31,15 @@ export const SlidePreview = ({
   const handleDownloadPDF = async () => {
     const allSlides = [...prefixTemplateSlides, ...slides, ...suffixTemplateSlides];
     
+    if (!details?.clientName?.trim()) {
+      toast({
+        title: "Client Name Required",
+        description: "Please enter a client name before downloading the PDF.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (allSlides.length === 0) {
       toast({
         title: "No slides to export",
@@ -42,7 +51,7 @@ export const SlidePreview = ({
 
     setIsGeneratingPdf(true);
     try {
-      await generatePDF(allSlides);
+      await generatePDF(allSlides, details.clientName, details);
       toast({
         title: "PDF Generated!",
         description: "Your presentation has been downloaded successfully.",
