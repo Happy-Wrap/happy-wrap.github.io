@@ -26,7 +26,15 @@ export interface SlideData {
   createdAt: Date;
 }
 
+export interface PresentationDetails {
+  clientName: string;
+  clientEmail?: string;
+  projectName?: string;
+  notes?: string;
+}
+
 export interface Presentation {
+  details: PresentationDetails;
   slides: SlideData[];
   activeSlideId: string | null;
 }

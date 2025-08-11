@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { SlideData } from "@/types/presentation";
+import { SlideData, PresentationDetails } from "@/types/presentation";
 import { defaultDataSource } from "@/data/defaultItems";
 import { RootState } from "@/store/store";
 import {
@@ -9,6 +9,7 @@ import {
   selectSlide,
   updateSlide,
   deleteSlide,
+  updateDetails,
 } from "@/store/presentationSlice";
 
 export const usePresentation = () => {
@@ -31,5 +32,7 @@ export const usePresentation = () => {
     updateSlide: (slideId: string, updates: Partial<SlideData>) => 
       dispatch(updateSlide({ slideId, updates })),
     deleteSlide: (slideId: string) => dispatch(deleteSlide(slideId)),
+    updateDetails: (updates: Partial<PresentationDetails>) => 
+      dispatch(updateDetails(updates)),
   };
 };

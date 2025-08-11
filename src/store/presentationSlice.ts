@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Presentation, SlideData, Item } from '@/types/presentation';
+import { Presentation, SlideData, Item, PresentationDetails } from '@/types/presentation';
 import { defaultDataSource } from '@/data/defaultItems';
 
 interface PresentationState {
@@ -11,6 +11,12 @@ const initialState: PresentationState = {
   presentation: {
     slides: [],
     activeSlideId: null,
+    details: {
+      clientName: '',
+      clientEmail: '',
+      projectName: '',
+      notes: ''
+    }
   },
   defaultItem: { id: '', name: '', price: 0, imageUrl: '' },
 };
@@ -54,8 +60,21 @@ const presentationSlice = createSlice({
           : null;
       }
     },
+    updateDetails: (state, action: PayloadAction<Partial<PresentationDetails>>) => {
+      state.presentation.details = {
+        ...state.presentation.details,
+        ...action.payload
+      };
+    },
   },
 });
 
-export const { setDefaultItem, addSlide, selectSlide, updateSlide, deleteSlide } = presentationSlice.actions;
+export const { 
+  setDefaultItem, 
+  addSlide, 
+  selectSlide, 
+  updateSlide, 
+  deleteSlide,
+  updateDetails 
+} = presentationSlice.actions;
 export default presentationSlice.reducer; 

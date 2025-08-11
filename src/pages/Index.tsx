@@ -7,8 +7,9 @@ const Index = () => {
     presentation, 
     addSlide, 
     selectSlide, 
-    updateSlide, 
-    deleteSlide 
+    updateSlide,
+    deleteSlide,
+    updateDetails
   } = usePresentation();
 
   return (
@@ -27,10 +28,12 @@ const Index = () => {
         <div className="w-1/3 min-w-[400px]">
           <SlideEditor
             slides={presentation.slides}
+            details={presentation.details}
             activeSlideId={presentation.activeSlideId}
             onAddSlide={addSlide}
             onSelectSlide={selectSlide}
             onUpdateSlide={updateSlide}
+            onUpdateDetails={updateDetails}
           />
         </div>
 
