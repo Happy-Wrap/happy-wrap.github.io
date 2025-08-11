@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { SlideData } from "@/types/presentation";
+import { SlideData, PresentationDetails } from "@/types/presentation";
 import { SlideCard } from "./SlideCard";
 import { Download, FileDown } from "lucide-react";
 import { generatePDF } from "@/utils/pdfGenerator";
@@ -12,6 +12,7 @@ import { prefixTemplateSlides, suffixTemplateSlides } from "@/data/templateSlide
 interface SlidePreviewProps {
   slides: SlideData[];
   activeSlideId: string | null;
+  details: PresentationDetails;
   onSelectSlide: (slideId: string) => void;
   onDeleteSlide: (slideId: string) => void;
 }
@@ -19,6 +20,7 @@ interface SlidePreviewProps {
 export const SlidePreview = ({
   slides,
   activeSlideId,
+  details,
   onSelectSlide,
   onDeleteSlide,
 }: SlidePreviewProps) => {
@@ -96,6 +98,7 @@ export const SlidePreview = ({
                     slide={activeSlide}
                     isActive={true}
                     isPreview={true}
+                    details={details}
                     onClick={() => {}}
                     onDelete={onDeleteSlide}
                   />
@@ -132,6 +135,7 @@ export const SlidePreview = ({
                     slide={slide}
                     isActive={slide.id === activeSlideId}
                     isPreview={true}
+                    details={details}
                     onClick={() => onSelectSlide(slide.id)}
                     onDelete={onDeleteSlide}
                   />
@@ -139,29 +143,34 @@ export const SlidePreview = ({
               ))}
 
               {/* User Created Slides */}
-              {slides.map((slide) => (
-                <Card key={slide.id} className="p-6 shadow-slide h-[calc(9/16*100%)]">
+              {slides.map((slide, index) => (
+                // <Card key={slide.id} className="p-6 shadow-slide h-[calc(9/16*100%)]">
                   <SlideCard
+                   key={slide.id}
                     slide={slide}
                     isActive={slide.id === activeSlideId}
                     isPreview={true}
+                    details={details}
                     onClick={() => onSelectSlide(slide.id)}
                     onDelete={onDeleteSlide}
+                    slideIndex={index + 1}
                   />
-                </Card>
+                // </Card>
               ))}
 
               {/* Template Slides (After) */}
               {suffixTemplateSlides.map((slide) => (
-                <Card key={slide.id} className="p-6 shadow-slide h-[calc(9/16*100%)]">
+                // <Card key={slide.id} className="p-6 shadow-slide h-[calc(9/16*100%)]">
                   <SlideCard
+                    key={slide.id}
                     slide={slide}
                     isActive={slide.id === activeSlideId}
                     isPreview={true}
+                    details={details}
                     onClick={() => onSelectSlide(slide.id)}
                     onDelete={onDeleteSlide}
                   />
-                </Card>
+                // </Card>
               ))}
 
               {slides.length === 0 && (

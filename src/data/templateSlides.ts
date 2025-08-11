@@ -38,7 +38,8 @@ export const prefixTemplateSlides: SlideData[] = [
     id: "template-requirements",
     type: "template",
     content: {
-      imageUrl: "/assets/slides/requirements.png"
+      imageUrl: "/assets/slides/option-template.png",
+      isRequirementsSlide: true
     },
     createdAt: new Date()
   }

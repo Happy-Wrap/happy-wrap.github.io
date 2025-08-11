@@ -182,7 +182,7 @@ const renderItemSlide = async (
   // Item price
   pdf.setFontSize(28);
   pdf.setTextColor(102, 51, 153); // Purple color
-  pdf.text(`$${item.price.toFixed(2)}`, centerX, pageHeight - margin - 40, { align: 'center' });
+  pdf.text(`₹${item.price.toFixed(2)}`, centerX, pageHeight - margin - 40, { align: 'center' });
 };
 
 const renderHamperSlide = async (
@@ -291,5 +291,5 @@ const renderHamperSlide = async (
   
   pdf.setFontSize(28);
   pdf.setTextColor(102, 51, 153); // Purple color
-  pdf.text(`$${totalPrice.toFixed(2)}`, centerX, pageHeight - margin - 30, { align: 'center' });
+  pdf.text(`₹${totalPrice.toFixed(2)}`, centerX, pageHeight - margin - 30, { align: 'center' });
 };

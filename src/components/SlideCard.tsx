@@ -11,22 +11,27 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import { SlideData, Item, Hamper, TemplateSlide } from "@/types/presentation";
+import { SlideData, Item, Hamper, TemplateSlide, PresentationDetails } from "@/types/presentation";
+import { format } from "date-fns";
 
 interface SlideCardProps {
   slide: SlideData;
   isActive: boolean;
   isPreview: boolean;
+  details?: PresentationDetails;
   onClick: () => void;
   onDelete: (slideId: string) => void;
+  slideIndex?: number;
 }
 
 export const SlideCard = ({ 
   slide, 
   isActive, 
-  isPreview, 
+  isPreview,
+  details,
   onClick, 
-  onDelete 
+  onDelete,
+  slideIndex 
 }: SlideCardProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -43,6 +48,24 @@ export const SlideCard = ({
   const renderSlideContent = () => {
     if (slide.type === 'template') {
       const template = slide.content as TemplateSlide;
+      if (template.isRequirementsSlide) {
+        return (
+          <div className="relative z-10 p-6 space-y-4 text-left">
+            <h2 className="text-3xl font-bold text-primary pl-24">{details?.clientName}</h2>
+            <div className="space-y-3 text-foreground text-xl font-bold pl-24">
+              <p>Purpose : {details?.purpose || 'N/A'}</p>
+              <p>Expected Quantity : {details?.quantity}</p>
+              <p>Budget (Excl. GST) : ₹{details?.budgetExclGst}</p>
+              <p>Budget (Incl. GST) : ₹{details?.budgetInclGst}</p>
+              <p>Deadline : {format(details?.deadline || new Date(), 'dd MMM yyyy')}</p>
+              <p>Branding Required : {details?.brandingRequired ? 'Yes' : 'No'}</p>
+              <p>Custom Packaging : {details?.customPackaging ? 'Yes' : 'No'}</p>
+              <p>Delivery Location : {details?.deliveryLocation || 'N/A'}</p>
+              <p>Remarks : <span className="font-normal text-lg">{details?.remarks || 'N/A'}</span></p>
+            </div>
+          </div>
+        );
+      }
       return (
         <div className="absolute inset-0">
           <img 
@@ -55,22 +78,28 @@ export const SlideCard = ({
     } else if (slide.type === 'item') {
       const item = slide.content as Item;
       return (
-        <div className="space-y-6 text-center">
-          {/* Item Name */}
-          <h2 className="text-2xl font-bold text-foreground">{item.name}</h2>
+        <div className="w-full h-full flex flex-col">
+          {/* Option Number */}
+          <h2 className="text-4xl font-bold text-primary px-4 pt-6">Option {slideIndex}</h2>
           
-          {/* Item Image */}
-          <div className="flex justify-center">
-            <img 
-              src={item.imageUrl} 
-              alt={item.name}
-              className="max-w-64 max-h-64 object-contain rounded-lg shadow-soft"
-            />
-          </div>
-          
-          {/* Item Price */}
-          <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            ${item.price.toFixed(2)}
+          {/* Main Content */}
+          <div className="flex-1 flex flex-col items-center justify-center space-y-8 px-6">
+            {/* Item Name */}
+            <h3 className="text-xl font-bold text-foreground">{item.name}</h3>
+            
+            {/* Item Image */}
+            <div className="flex justify-center">
+              <img 
+                src={item.imageUrl} 
+                alt={item.name}
+                className="max-w-64 max-h-64 object-contain rounded-lg shadow-soft"
+              />
+            </div>
+            
+            {/* Item Price */}
+            <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              ₹{item.price.toFixed(2)}
+            </div>
           </div>
         </div>
       );
@@ -91,13 +120,13 @@ export const SlideCard = ({
                 />
                 <p className="font-medium text-sm">{item.name}</p>
                 <p className="text-sm text-muted-foreground">
-                  ${item.price.toFixed(2)}
+                  ₹{item.price.toFixed(2)}
                 </p>
               </div>
             ))}
           </div>
           <div className="text-3xl font-bold text-center bg-gradient-primary bg-clip-text text-transparent">
-            ${hamper.items.reduce((sum, item) => sum + item.price, 0).toFixed(2)}
+            ₹{hamper.items.reduce((sum, item) => sum + item.price, 0).toFixed(2)}
           </div>
         </div>
       );
@@ -114,21 +143,21 @@ export const SlideCard = ({
         `}
         onClick={onClick}
       >
-        {slide.type === 'template' ? (
+        {slide.type === 'template' && !(slide.content as TemplateSlide).isRequirementsSlide ? (
           <img 
             src={(slide.content as TemplateSlide).imageUrl} 
             alt="Template Slide"
             className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
-          <div className="absolute inset-0 p-6">
-            {/* Add background image for non-template slides */}
+          <div className="h-full">
+            {/* Add background image for non-template slides and requirements slide */}
             <img 
               src="/assets/slides/option-template.png" 
               alt="Slide Background"
               className="absolute inset-0 w-full h-full object-cover"
             />
-            <div className="relative z-10">
+            <div className="relative z-10 h-full">
               {renderSlideContent()}
             </div>
           </div>

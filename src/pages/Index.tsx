@@ -42,6 +42,7 @@ const Index = () => {
           <SlidePreview
             slides={presentation.slides}
             activeSlideId={presentation.activeSlideId}
+            details={presentation.details}
             onSelectSlide={selectSlide}
             onDeleteSlide={deleteSlide}
           />

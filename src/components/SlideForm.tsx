@@ -157,7 +157,7 @@ export const SlideForm = ({ slide, onUpdate }: SlideFormProps) => {
                         <div className="truncate">{item.name}</div>
                         <div className="text-sm text-muted-foreground flex flex-col">
                           <span className="text-xs">{item.brand} • {item.category}</span>
-                          <span>${item.price.toFixed(2)}</span>
+                          <span>₹{item.price.toFixed(2)}</span>
                         </div>
                       </div>
                     </CommandItem>
@@ -187,7 +187,7 @@ export const SlideForm = ({ slide, onUpdate }: SlideFormProps) => {
                   />
                   <span className="font-medium">{item.name}</span>
                   <span className="text-muted-foreground">
-                    ${item.price.toFixed(2)}
+                    ₹{item.price.toFixed(2)}
                   </span>
                 </div>
                 <Button

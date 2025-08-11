@@ -13,9 +13,15 @@ const initialState: PresentationState = {
     activeSlideId: null,
     details: {
       clientName: '',
-      clientEmail: '',
-      projectName: '',
-      notes: ''
+      purpose: '',
+      quantity: 0,
+      budgetExclGst: 0,
+      budgetInclGst: 0,
+      deadline: new Date(),
+      brandingRequired: false,
+      customPackaging: false,
+      deliveryLocation: '',
+      remarks: ''
     }
   },
   defaultItem: { id: '', name: '', price: 0, imageUrl: '' },
