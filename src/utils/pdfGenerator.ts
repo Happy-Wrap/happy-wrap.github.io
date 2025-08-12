@@ -68,7 +68,7 @@ export const generatePDF = async (slides: SlideData[], clientName: string, detai
       if (templateSlide.isRequirementsSlide) {
         templateSlide.details = details;
       }
-      await renderTemplateSlide(pdf, templateSlide, pageWidth, pageHeight);
+      await renderTemplateSlide(pdf, templateSlide, pageWidth * 3.78, pageHeight * 3.78);
     } else {
       // Create canvas for non-template slides
       const canvas = createCanvas(pageWidth * 3.78, pageHeight * 3.78); // Convert mm to px (1mm ≈ 3.78px)
@@ -153,7 +153,7 @@ const renderTemplateSlide = async (
     const x = ((pageWidth * 3.78) - finalWidth) / 2;
     const y = ((pageHeight * 3.78) - finalHeight) / 2;
     
-    ctx.drawImage(img, x, y, finalWidth, finalHeight);
+    ctx.drawImage(img, 0, 0, pageWidth, pageHeight);
 
     // If this is a requirements slide, add the content
     if (template.isRequirementsSlide && template.details) {
@@ -184,7 +184,8 @@ const renderTemplateSlide = async (
       details.forEach(detail => {
         renderText(ctx, detail, margin + leftPadding, currentY, {
           fontSize: 8 * 3.78,
-          fontWeight: 'bold'
+          fontFamily: 'Calibri',
+          // fontWeight: 'bold'
         });
         currentY += 10 * 3.78;
       });
@@ -193,7 +194,8 @@ const renderTemplateSlide = async (
       // currentY += 15 * 3.78;
       renderText(ctx, 'Remarks :', margin + leftPadding, currentY, {
         fontSize: 8 * 3.78,
-        fontWeight: 'bold'
+        fontFamily: 'Calibri',
+        // fontWeight: 'bold'
       });
       renderText(ctx, template.details.remarks || 'N/A', margin + leftPadding + (50 * 3.78), currentY, {
         fontSize: 8 * 3.78
