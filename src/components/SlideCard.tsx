@@ -58,8 +58,8 @@ export const SlideCard = ({
       if (template.isRequirementsSlide) {
         return (
           <div className="relative z-10 p-6 space-y-4 text-left">
-            <h3 className="text-3xl font-bold text-primary pl-24">{details?.clientName}</h3>
-            <div className="space-y-3 text-foreground text-lg font-bold pl-24">
+            <p className="text-2xl font-bold text-primary pl-24">{details?.clientName}</p>
+            <div className="space-y-3 text-foreground text-l font-bold pl-24">
               <p>Purpose : {details?.purpose || 'N/A'}</p>
               <p>Expected Quantity : {details?.quantity}</p>
               <p>Budget (Excl. GST) : ₹{details?.budgetExclGst}</p>
@@ -88,7 +88,7 @@ export const SlideCard = ({
       return (
         <div className="w-full h-full flex flex-col">
           {/* Option Number */}
-          <h3 className="text-4xl font-bold text-primary px-4 pt-6">Option {slideIndex}</h3>
+          <p className="text-2xl font-bold text-primary px-4 pt-6">Option {slideIndex}</p>
           
           {/* Main Content */}
           <div className="flex-1 flex flex-col items-center justify-center space-y-8 px-6">
@@ -121,7 +121,7 @@ export const SlideCard = ({
         <div className="w-full h-full flex flex-col">
           {/* Option Number */}
           {typeof slideIndex !== 'undefined' && (
-            <h2 className="text-4xl font-bold text-primary px-4 pt-6">Option {slideIndex}</h2>
+            <p className="text-2xl font-bold text-primary px-4 pt-6">Option {slideIndex}</p>
           )}
           
           {/* Main Content */}
