@@ -91,9 +91,9 @@ export const generatePDF = async (slides: SlideData[], clientName: string, detai
 
       // Render slide content
       if (slide.type === 'item') {
-        await renderItemSlide(canvas, slide.content as Item, pageWidth * 3.78, pageHeight * 3.78, margin * 3.78, optionIndex++);
+        await renderItemSlide(canvas, slide.content as Item, pageWidth * 3.78, pageHeight * 3.78, margin * 3.78, optionIndex++, slide);
       } else {
-        await renderHamperSlide(canvas, slide.content as Hamper, pageWidth * 3.78, pageHeight * 3.78, margin * 3.78, optionIndex++);
+        await renderHamperSlide(canvas, slide.content as Hamper, pageWidth * 3.78, pageHeight * 3.78, margin * 3.78, optionIndex++, slide);
       }
 
       // Add footer
@@ -217,7 +217,8 @@ const renderItemSlide = async (
   pageWidth: number,
   pageHeight: number,
   margin: number,
-  slideIndex?: number
+  slideIndex?: number,
+  slide?: SlideData,
 ): Promise<void> => {
   const ctx = canvas.getContext('2d')!;
   const centerX = pageWidth / 2;
@@ -291,12 +292,16 @@ const renderItemSlide = async (
   }
 
   // Item price
-  renderText(ctx, `₹${item.price.toFixed(2)}`, centerX, pageHeight - margin - (40 * 3.78), {
-    fontSize: 8 * 3.78,
-    color: '#663399',
-    align: 'center',
-    fontWeight: 'bold'
-  });
+  const mode = slide?.priceDisplayMode ?? 'show';
+  if (mode !== 'hide') {
+    const priceText = mode === 'upon_request' ? 'Price upon request' : `₹${item.price.toFixed(2)}`;
+    renderText(ctx, priceText, centerX, pageHeight - margin - (40 * 3.78), {
+      fontSize: 8 * 3.78,
+      color: '#663399',
+      align: 'center',
+      fontWeight: 'bold'
+    });
+  }
 };
 
 const renderHamperSlide = async (
@@ -305,7 +310,8 @@ const renderHamperSlide = async (
   pageWidth: number,
   pageHeight: number,
   margin: number,
-  slideIndex?: number
+  slideIndex?: number,
+  slide?: SlideData,
 ): Promise<void> => {
   const ctx = canvas.getContext('2d')!;
   const centerX = pageWidth / 2;
@@ -418,17 +424,21 @@ const renderHamperSlide = async (
   }
 
   // Total price
-  const totalPrice = hamper.items.reduce((sum, item) => sum + item.price, 0);
-  renderText(ctx, 'Total Value', centerX, currentY, {
-    fontSize: 8 * 3.78,
-    color: '#808080',
-    align: 'center'
-  });
-  
-  renderText(ctx, `₹${totalPrice.toFixed(2)}`, centerX, currentY + (20 * 3.78), {
-    fontSize: 12 * 3.78,
-    color: '#663399',
-    align: 'center',
-    fontWeight: 'bold'
-  });
+  const mode = slide?.priceDisplayMode ?? 'show';
+  if (mode !== 'hide') {
+    const totalPrice = hamper.items.reduce((sum, item) => sum + item.price, 0);
+    const priceText = mode === 'upon_request' ? 'Price upon request' : `₹${totalPrice.toFixed(2)}`;
+    renderText(ctx, 'Total Value', centerX, currentY, {
+      fontSize: 8 * 3.78,
+      color: '#808080',
+      align: 'center'
+    });
+    
+    renderText(ctx, priceText, centerX, currentY + (20 * 3.78), {
+      fontSize: 12 * 3.78,
+      color: '#663399',
+      align: 'center',
+      fontWeight: 'bold'
+    });
+  }
 };

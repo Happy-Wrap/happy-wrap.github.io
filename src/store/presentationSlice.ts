@@ -40,6 +40,7 @@ const presentationSlice = createSlice({
         type: 'item',
         content: state.defaultItem,
         createdAt: new Date(),
+        priceDisplayMode: 'show',
       };
       state.presentation.slides.push(newSlide);
       state.presentation.activeSlideId = newSlide.id;

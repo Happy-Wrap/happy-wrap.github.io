@@ -21,11 +21,14 @@ export interface TemplateSlide {
 
 export type SlideType = 'item' | 'hamper' | 'template';
 
+export type PriceDisplayMode = 'show' | 'upon_request' | 'hide';
+
 export interface SlideData {
   id: string;
   type: SlideType;
   content: Item | Hamper | TemplateSlide;
   createdAt: Date;
+  priceDisplayMode?: PriceDisplayMode;
 }
 
 export interface PresentationDetails {

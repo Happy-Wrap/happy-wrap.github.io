@@ -45,6 +45,13 @@ export const SlideCard = ({
     setShowDeleteDialog(false);
   };
 
+  const renderPriceText = (amount: number) => {
+    const mode = slide.priceDisplayMode ?? 'show';
+    if (mode === 'hide') return null;
+    if (mode === 'upon_request') return 'Price upon request';
+    return `₹${amount.toFixed(2)}`;
+  };
+
   const renderSlideContent = () => {
     if (slide.type === 'template') {
       const template = slide.content as TemplateSlide;
@@ -77,6 +84,7 @@ export const SlideCard = ({
       );
     } else if (slide.type === 'item') {
       const item = slide.content as Item;
+      const priceText = renderPriceText(item.price);
       return (
         <div className="w-full h-full flex flex-col">
           {/* Option Number */}
@@ -97,14 +105,18 @@ export const SlideCard = ({
             </div>
             
             {/* Item Price */}
-            <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              ₹{item.price.toFixed(2)}
-            </div>
+            {priceText && (
+              <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                {priceText}
+              </div>
+            )}
           </div>
         </div>
       );
     } else {
       const hamper = slide.content as Hamper;
+      const total = hamper.items.reduce((sum, item) => sum + item.price, 0);
+      const priceText = renderPriceText(total);
       return (
         <div className="w-full h-full flex flex-col">
           {/* Option Number */}
@@ -145,12 +157,14 @@ export const SlideCard = ({
             </div>
 
             {/* Total Value */}
-            <div className="space-y-2 text-center">
-              <p className="text-sm text-muted-foreground">Total Value</p>
-              <p className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                ₹{hamper.items.reduce((sum, item) => sum + item.price, 0).toFixed(2)}
-              </p>
-            </div>
+            {(slide.priceDisplayMode ?? 'show') !== 'hide' && (
+              <div className="space-y-2 text-center">
+                <p className="text-sm text-muted-foreground">Total Value</p>
+                <p className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                  {priceText}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       );

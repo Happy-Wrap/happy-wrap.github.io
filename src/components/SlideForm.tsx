@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface SlideFormProps {
   slide: SlideData;
@@ -47,6 +48,7 @@ export const SlideForm = ({ slide, onUpdate }: SlideFormProps) => {
     onUpdate({
       type: newType,
       content: newContent,
+      priceDisplayMode: slide.priceDisplayMode ?? 'show',
     });
   };
 
@@ -100,6 +102,31 @@ export const SlideForm = ({ slide, onUpdate }: SlideFormProps) => {
           </SelectContent>
         </Select>
       </div>
+
+      {/* Prices Display Mode */}
+      {(slide.type === 'item' || slide.type === 'hamper') && (
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Prices</Label>
+          <RadioGroup
+            value={slide.priceDisplayMode ?? 'show'}
+            onValueChange={(value) => onUpdate({ priceDisplayMode: value as SlideData['priceDisplayMode'] })}
+            className="grid grid-cols-1 gap-3"
+          >
+            <div className="flex items-center space-x-3">
+              <RadioGroupItem id={`price-show-${slide.id}`} value="show" />
+              <Label htmlFor={`price-show-${slide.id}`}>Show</Label>
+            </div>
+            <div className="flex items-center space-x-3">
+              <RadioGroupItem id={`price-upon-request-${slide.id}`} value="upon_request" />
+              <Label htmlFor={`price-upon-request-${slide.id}`}>Upon request</Label>
+            </div>
+            <div className="flex items-center space-x-3">
+              <RadioGroupItem id={`price-hide-${slide.id}`} value="hide" />
+              <Label htmlFor={`price-hide-${slide.id}`}>Do not show</Label>
+            </div>
+          </RadioGroup>
+        </div>
+      )}
 
       {/* Item Selection */}
       <div className="space-y-2">
