@@ -110,6 +110,7 @@ export const SlidePreview = ({
                     details={details}
                     onClick={() => {}}
                     onDelete={onDeleteSlide}
+                    slideIndex={slides.findIndex(s => s.id === activeSlide.id) + 1}
                   />
                 // </Card>
               ) : (

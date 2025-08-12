@@ -106,27 +106,51 @@ export const SlideCard = ({
     } else {
       const hamper = slide.content as Hamper;
       return (
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-center text-foreground">
-            Gift Hamper
-          </h2>
-          <div className="grid grid-cols-2 gap-4">
-            {hamper.items.map((item, index) => (
-              <div key={index} className="text-center space-y-2">
-                <img 
-                  src={item.imageUrl} 
-                  alt={item.name}
-                  className="w-32 h-32 mx-auto object-contain rounded-lg shadow-soft"
-                />
-                <p className="font-medium text-sm">{item.name}</p>
-                <p className="text-sm text-muted-foreground">
-                  ₹{item.price.toFixed(2)}
-                </p>
-              </div>
-            ))}
-          </div>
-          <div className="text-3xl font-bold text-center bg-gradient-primary bg-clip-text text-transparent">
-            ₹{hamper.items.reduce((sum, item) => sum + item.price, 0).toFixed(2)}
+        <div className="w-full h-full flex flex-col">
+          {/* Option Number */}
+          {typeof slideIndex !== 'undefined' && (
+            <h2 className="text-4xl font-bold text-primary px-4 pt-6">Option {slideIndex}</h2>
+          )}
+          
+          {/* Main Content */}
+          <div className="flex-1 flex flex-col items-center justify-center space-y-6 px-6">
+            <h2 className="text-xl font-medium text-foreground">
+              Product Hamper
+            </h2>
+
+            {/* Item Images */}
+            <div className="flex items-center justify-center w-full px-12 gap-8">
+              {hamper.items.map((item, index) => (
+                <div key={index} className="flex flex-col items-center gap-2">
+                  <div className="relative">
+                    <img 
+                      src={item.imageUrl} 
+                      alt={item.name}
+                      className="w-24 h-24 object-contain rounded-lg shadow-soft"
+                      onError={(e) => {
+                        // Fallback for failed image loads
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        target.parentElement!.innerHTML = `
+                          <div class="w-24 h-24 rounded-lg bg-muted flex items-center justify-center text-2xl font-bold text-muted-foreground">
+                            ${item.name.charAt(0)}
+                          </div>
+                        `;
+                      }}
+                    />
+                  </div>
+                  <span className="text-sm text-muted-foreground text-center">{item.name}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Total Value */}
+            <div className="space-y-2 text-center">
+              <p className="text-sm text-muted-foreground">Total Value</p>
+              <p className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                ₹{hamper.items.reduce((sum, item) => sum + item.price, 0).toFixed(2)}
+              </p>
+            </div>
           </div>
         </div>
       );
