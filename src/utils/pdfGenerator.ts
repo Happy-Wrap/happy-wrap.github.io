@@ -89,7 +89,8 @@ export const generatePDF = async (slides: SlideData[], clientName: string, detai
 
   const pdf = new jsPDF({
     orientation: 'landscape',
-    unit: 'mm',
+    unit: "px",      // Use pixels for no conversion confusion
+    format: [1920, 1080]
   });
 
   // Add fonts to PDF
@@ -113,10 +114,10 @@ export const generatePDF = async (slides: SlideData[], clientName: string, detai
       if (templateSlide.isRequirementsSlide) {
         templateSlide.details = details;
       }
-      await renderTemplateSlide(pdf, templateSlide, pageWidth * 3.78, pageHeight * 3.78);
+      await renderTemplateSlide(pdf, templateSlide, pageWidth , pageHeight );
     } else {
       // Create canvas for non-template slides
-      const canvas = createCanvas(pageWidth * 3.78, pageHeight * 3.78); // Convert mm to px (1mm ≈ 3.78px)
+      const canvas = createCanvas(pageWidth, pageHeight); // Convert mm to px (1mm ≈ 3.78px)
       const ctx = canvas.getContext('2d')!;
 
       // Add logo
@@ -136,13 +137,13 @@ export const generatePDF = async (slides: SlideData[], clientName: string, detai
 
       // Render slide content
       if (slide.type === 'item') {
-        await renderItemSlide(canvas, slide.content as Item, pageWidth * 3.78, pageHeight * 3.78, margin * 3.78, optionIndex++, slide);
+        await renderItemSlide(canvas, slide.content as Item, pageWidth, pageHeight , margin * 3.78, optionIndex++, slide);
       } else {
-        await renderHamperSlide(canvas, slide.content as Hamper, pageWidth * 3.78, pageHeight * 3.78, margin * 3.78, optionIndex++, slide);
+        await renderHamperSlide(canvas, slide.content as Hamper, pageWidth , pageHeight , margin * 3.78, optionIndex++, slide);
       }
 
       // Add footer
-      renderText(ctx, 'www.happywrap.in', pageWidth * 3.78 / 2, (pageHeight * 3.78) - (margin * 3.78), {
+      renderText(ctx, 'www.happywrap.in', pageWidth  / 2, (pageHeight ) - (margin * 3.78), {
         fontSize: 6 * 3.78,
         color: '#808080',
         align: 'center',
@@ -171,7 +172,7 @@ const renderTemplateSlide = async (
   pageHeight: number
 ): Promise<void> => {
   try {
-    const canvas = createCanvas(pageWidth * 3.78, pageHeight * 3.78);
+    const canvas = createCanvas(pageWidth , pageHeight );
     const ctx = canvas.getContext('2d')!;
 
     // Add template background image
@@ -248,11 +249,14 @@ const renderTemplateSlide = async (
         fontSize: 8 * 3.78,
         fontFamily: 'Calibri'
       });
-    }
 
     // Convert canvas to image and add to PDF
     const imgData = canvas.toDataURL('image/jpeg', 0.95);
     pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
+    } else {
+      pdf.addImage(img, 'JPEG', 0, 0, pageWidth, pageHeight);
+    }
+
   } catch (error) {
     console.warn('Could not render template slide:', error);
     pdf.setFontSize(14);
