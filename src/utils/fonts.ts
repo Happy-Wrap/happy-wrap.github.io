@@ -1,37 +1,30 @@
 // Font declarations
-export const latoRegular = new FontFace('Lato', 'url(/fonts/Lato-Regular.woff2)', {
+export const calibriRegular = new FontFace('Calibri', 'url(/fonts/Calibri.woff2)', {
   style: 'normal',
   weight: '400'
 });
 
-export const latoBold = new FontFace('Lato', 'url(/fonts/Lato-Bold.woff2)', {
+export const calibriBold = new FontFace('Calibri', 'url(/fonts/Calibri-Bold.woff2)', {
   style: 'normal',
   weight: '700'
 });
 
-export const latoItalic = new FontFace('Lato', 'url(/fonts/Lato-Italic.woff2)', {
-  style: 'italic',
-  weight: '400'
-});
-
-export const latoBoldItalic = new FontFace('Lato', 'url(/fonts/Lato-BoldItalic.woff2)', {
-  style: 'italic',
-  weight: '700'
+export const calibriLight = new FontFace('Calibri', 'url(/fonts/Calibri-Light.woff2)', {
+  style: 'normal',
+  weight: '300'
 });
 
 export const loadFonts = async () => {
   try {
     // Load fonts
-    const regular = await latoRegular.load();
-    const bold = await latoBold.load();
-    const italic = await latoItalic.load();
-    const boldItalic = await latoBoldItalic.load();
+    const regular = await calibriRegular.load();
+    const bold = await calibriBold.load();
+    const light = await calibriLight.load();
     
     // Add fonts to document
     document.fonts.add(regular);
     document.fonts.add(bold);
-    document.fonts.add(italic);
-    document.fonts.add(boldItalic);
+    document.fonts.add(light);
     
     // Wait for fonts to be ready
     await document.fonts.ready;

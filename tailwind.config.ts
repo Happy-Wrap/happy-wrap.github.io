@@ -17,6 +17,11 @@ export default {
 				'2xl': '1400px'
 			}
 		},
+		fontFamily: {
+			sans: ['Calibri', 'sans-serif'],
+			serif: ['Calibri', 'serif'],
+			mono: ['monospace'],
+		},
 		extend: {
 			colors: {
 				border: 'hsl(var(--border))',

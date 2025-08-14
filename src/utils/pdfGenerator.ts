@@ -5,6 +5,44 @@ import logoImage from '@/assets/logo.png';
 import { format } from 'date-fns';
 import { loadFonts } from './fonts';
 
+// Add Calibri fonts to jsPDF
+const addFontsToPDF = async (pdf: jsPDF) => {
+  try {
+    // Helper function to convert ArrayBuffer to base64 string
+    const arrayBufferToBase64 = (buffer: ArrayBuffer) => {
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
+    };
+
+    // Add normal font
+    const normalFontResponse = await fetch('/fonts/Calibri.ttf');
+    const normalFontBuffer = await normalFontResponse.arrayBuffer();
+    pdf.addFileToVFS('Calibri.ttf', arrayBufferToBase64(normalFontBuffer));
+    pdf.addFont('Calibri.ttf', 'Calibri', 'normal');
+
+    // Add bold font
+    const boldFontResponse = await fetch('/fonts/Calibri-Bold.ttf');
+    const boldFontBuffer = await boldFontResponse.arrayBuffer();
+    pdf.addFileToVFS('Calibri-Bold.ttf', arrayBufferToBase64(boldFontBuffer));
+    pdf.addFont('Calibri-Bold.ttf', 'Calibri', 'bold');
+
+    // Add light font
+    const lightFontResponse = await fetch('/fonts/Calibri-Light.ttf');
+    const lightFontBuffer = await lightFontResponse.arrayBuffer();
+    pdf.addFileToVFS('Calibri-Light.ttf', arrayBufferToBase64(lightFontBuffer));
+    pdf.addFont('Calibri-Light.ttf', 'Calibri', 'light');
+
+    // Set default font
+    pdf.setFont('Calibri', 'normal');
+  } catch (error) {
+    console.error('Failed to load fonts for PDF:', error);
+  }
+};
+
 // Helper function to format currency with rupee symbol
 const formatCurrency = (amount: number | string | undefined): string => {
   if (amount === undefined) return 'N/A';
@@ -33,7 +71,7 @@ const renderText = (ctx: CanvasRenderingContext2D, text: string, x: number, y: n
 } = {}) => {
   const {
     fontSize = 16,
-    fontFamily = 'Lato',
+    fontFamily = 'Calibri',
     fontWeight = 'normal',
     color = '#000000',
     align = 'left'
@@ -53,6 +91,9 @@ export const generatePDF = async (slides: SlideData[], clientName: string, detai
     orientation: 'landscape',
     unit: 'mm',
   });
+
+  // Add fonts to PDF
+  await addFontsToPDF(pdf);
 
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();

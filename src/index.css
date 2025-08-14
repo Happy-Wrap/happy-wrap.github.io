@@ -2,6 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Calibri Font Declarations */
+@font-face {
+  font-family: 'Calibri';
+  src: url('/fonts/Calibri.woff2') format('woff2'),
+       url('/fonts/Calibri.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Calibri';
+  src: url('/fonts/Calibri-Bold.woff2') format('woff2'),
+       url('/fonts/Calibri-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Calibri';
+  src: url('/fonts/Calibri-Light.woff2') format('woff2'),
+       url('/fonts/Calibri-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Override any Carlito usage with Calibri */
+.slide-preview, .slide-content {
+  font-family: 'Calibri', system-ui, sans-serif !important;
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
@@ -132,9 +165,11 @@ All colors MUST be HSL.
 @layer base {
   * {
     @apply border-border;
+    font-family: 'Calibri', system-ui, sans-serif;
   }
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Calibri', system-ui, sans-serif;
   }
 }
