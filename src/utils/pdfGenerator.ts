@@ -3,6 +3,7 @@ import html2canvas from 'html2canvas';
 import { SlideData, Item, Hamper, TemplateSlide, PresentationDetails } from '@/types/presentation';
 import logoImage from '@/assets/logo.png';
 import { format } from 'date-fns';
+import { loadFonts } from './fonts';
 
 // Helper function to format currency with rupee symbol
 const formatCurrency = (amount: number | string | undefined): string => {
@@ -32,7 +33,7 @@ const renderText = (ctx: CanvasRenderingContext2D, text: string, x: number, y: n
 } = {}) => {
   const {
     fontSize = 16,
-    fontFamily = 'Helvetica',
+    fontFamily = 'Lato',
     fontWeight = 'normal',
     color = '#000000',
     align = 'left'
@@ -45,6 +46,9 @@ const renderText = (ctx: CanvasRenderingContext2D, text: string, x: number, y: n
 };
 
 export const generatePDF = async (slides: SlideData[], clientName: string, details: PresentationDetails): Promise<void> => {
+  // Load fonts first
+  await loadFonts();
+
   const pdf = new jsPDF({
     orientation: 'landscape',
     unit: 'mm',
@@ -100,7 +104,8 @@ export const generatePDF = async (slides: SlideData[], clientName: string, detai
       renderText(ctx, 'www.happywrap.in', pageWidth * 3.78 / 2, (pageHeight * 3.78) - (margin * 3.78), {
         fontSize: 6 * 3.78,
         color: '#808080',
-        align: 'center'
+        align: 'center',
+        fontFamily: 'Calibri'
       });
 
       // Convert canvas to image and add to PDF
@@ -165,7 +170,8 @@ const renderTemplateSlide = async (
       renderText(ctx, template.details.clientName || 'N/A', margin + leftPadding, currentY, {
         fontSize: 12 * 3.78,
         color: '#663399',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        fontFamily: 'Calibri'
       });
       currentY += 25 * 3.78;
 
@@ -198,7 +204,8 @@ const renderTemplateSlide = async (
         // fontWeight: 'bold'
       });
       renderText(ctx, template.details.remarks || 'N/A', margin + leftPadding + (50 * 3.78), currentY, {
-        fontSize: 8 * 3.78
+        fontSize: 8 * 3.78,
+        fontFamily: 'Calibri'
       });
     }
 
@@ -247,14 +254,16 @@ const renderItemSlide = async (
     renderText(ctx, `Option ${slideIndex}`, margin + (10 * 3.78), margin + (40 * 3.78), {
       fontSize: 12 * 3.78,
       color: '#663399',
-      fontWeight: 'bold'
+      fontWeight: 'bold',
+      fontFamily: 'Calibri'
     });
   }
 
   // Item name
   renderText(ctx, item.name, centerX, margin + (40 * 3.78), {
     fontSize: 8 * 3.78,
-    align: 'center'
+    align: 'center',
+    fontFamily: 'Calibri'
   });
 
   // Item image
@@ -289,7 +298,8 @@ const renderItemSlide = async (
     renderText(ctx, '[Image not available]', centerX, centerY, {
       fontSize: 8 * 3.78,
       color: '#808080',
-      align: 'center'
+      align: 'center',
+      fontFamily: 'Calibri'
     });
   }
 
@@ -301,7 +311,8 @@ const renderItemSlide = async (
       fontSize: 8 * 3.78,
       color: '#663399',
       align: 'center',
-      fontWeight: 'bold'
+      fontWeight: 'bold',
+      fontFamily: 'Calibri'
     });
   }
 };
@@ -340,7 +351,8 @@ const renderHamperSlide = async (
     renderText(ctx, `Option ${slideIndex}`, margin + (10 * 3.78), margin + (40 * 3.78), {
       fontSize: 12 * 3.78,
       fontWeight: 'bold',
-      color: '#663399' // primary color
+      color: '#663399', // primary color
+      fontFamily: 'Calibri'
     });
   }
 
@@ -358,7 +370,8 @@ const renderHamperSlide = async (
   // Hamper title
   renderText(ctx, 'Product Hamper', centerX, margin + (40 * 3.78), {
     fontSize: 8 * 3.78,
-    align: 'center'
+    align: 'center',
+    fontFamily: 'Calibri'
   });
   currentY += 20 * 3.78;
 
@@ -389,7 +402,8 @@ const renderHamperSlide = async (
         renderText(ctx, item.name, imageX + (imageSize / 2), currentY + imageSize + (10 * 3.78), {
           fontSize: 6 * 3.78,
           color: '#666666',
-          align: 'center'
+          align: 'center',
+          fontFamily: 'Calibri'
         });
       } catch (error) {
         console.warn(`Could not add hamper item image for ${item.name}:`, error);
@@ -403,14 +417,16 @@ const renderHamperSlide = async (
         renderText(ctx, item.name.charAt(0).toUpperCase(), imageX + imageSize / 2, currentY + imageSize / 2 + (2 * 3.78), {
           fontSize: 8 * 3.78,
           color: '#808080',
-          align: 'center'
+          align: 'center',
+          fontFamily: 'Calibri'
         });
         
         // Add item name below the placeholder
         renderText(ctx, item.name, imageX + (imageSize / 2), currentY + imageSize + (10 * 3.78), {
           fontSize: 6 * 3.78,
           color: '#666666',
-          align: 'center'
+          align: 'center',
+          fontFamily: 'Calibri'
         });
       }
     }
@@ -420,7 +436,8 @@ const renderHamperSlide = async (
     renderText(ctx, 'No items in hamper', centerX, currentY, {
       fontSize: 8 * 3.78,
       color: '#808080',
-      align: 'center'
+      align: 'center',
+      fontFamily: 'Calibri'
     });
     currentY += 20 * 3.78;
   }
@@ -433,14 +450,16 @@ const renderHamperSlide = async (
     renderText(ctx, 'Total Value', centerX, currentY, {
       fontSize: 8 * 3.78,
       color: '#808080',
-      align: 'center'
+      align: 'center',
+      fontFamily: 'Calibri'
     });
     
     renderText(ctx, priceText, centerX, currentY + (20 * 3.78), {
       fontSize: 12 * 3.78,
       color: '#663399',
       align: 'center',
-      fontWeight: 'bold'
+      fontWeight: 'bold',
+      fontFamily: 'Calibri'
     });
   }
 };
