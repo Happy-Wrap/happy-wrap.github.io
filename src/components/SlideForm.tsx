@@ -166,8 +166,12 @@ export const SlideForm = ({ slide, onUpdate }: SlideFormProps) => {
               <CommandList>
                 <CommandEmpty>No items found.</CommandEmpty>
                 <CommandGroup>
-                  {availableItems.map((item) => {
-                    console.log('Item:', item, "");
+                  {availableItems
+                    .filter((item) => {
+                      const searchStr = `${item.name} ${item.brand} ${item.category} ${item.subCategory}`.toLowerCase();
+                      return searchStr.includes(searchQuery.toLowerCase());
+                    })
+                    .map((item) => {
                     return (
                     <CommandItem
                       key={item.id}
