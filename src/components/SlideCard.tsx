@@ -107,10 +107,9 @@ export const SlideCard = ({
                 className="w-40 text-2xl font-bold text-foreground bg-background"
               />
               <Button
-                variant="ghost"
                 size="icon"
                 onClick={handlePriceSave}
-                className="h-8 w-8"
+                className="h-8 w-8 bg-gradient-primary text-white hover:opacity-90"
               >
                 <Check className="h-4 w-4" />
               </Button>
