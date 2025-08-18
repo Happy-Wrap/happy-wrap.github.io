@@ -47,6 +47,7 @@ const Index = () => {
             details={presentation.details}
             onSelectSlide={selectSlide}
             onDeleteSlide={deleteSlide}
+            onUpdate={updateSlide}
           />
         </div>
       </div>

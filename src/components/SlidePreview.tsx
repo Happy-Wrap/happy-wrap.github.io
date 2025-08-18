@@ -15,6 +15,7 @@ interface SlidePreviewProps {
   details: PresentationDetails;
   onSelectSlide: (slideId: string) => void;
   onDeleteSlide: (slideId: string) => void;
+  onUpdate: (slideId: string, updatedSlide: SlideData) => void;
 }
 
 export const SlidePreview = ({
@@ -23,6 +24,7 @@ export const SlidePreview = ({
   details,
   onSelectSlide,
   onDeleteSlide,
+  onUpdate,
 }: SlidePreviewProps) => {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const { toast } = useToast();
@@ -110,6 +112,7 @@ export const SlidePreview = ({
                     details={details}
                     onClick={() => {}}
                     onDelete={onDeleteSlide}
+                    onUpdate={onUpdate}
                     slideIndex={slides.findIndex(s => s.id === activeSlide.id) + 1}
                   />
                 // </Card>
@@ -148,6 +151,7 @@ export const SlidePreview = ({
                     details={details}
                     onClick={() => onSelectSlide(slide.id)}
                     onDelete={onDeleteSlide}
+                    onUpdate={onUpdate}
                   />
                 // </Card>
               ))}
@@ -163,6 +167,7 @@ export const SlidePreview = ({
                     details={details}
                     onClick={() => onSelectSlide(slide.id)}
                     onDelete={onDeleteSlide}
+                    onUpdate={onUpdate}
                     slideIndex={index + 1}
                   />
                 // </Card>
@@ -179,6 +184,7 @@ export const SlidePreview = ({
                     details={details}
                     onClick={() => onSelectSlide(slide.id)}
                     onDelete={onDeleteSlide}
+                    onUpdate={onUpdate}
                   />
                 // </Card>
               ))}

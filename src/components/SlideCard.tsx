@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,7 +10,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Trash2, Edit2, Check } from "lucide-react";
 import { SlideData, Item, Hamper, TemplateSlide, PresentationDetails } from "@/types/presentation";
 import { format } from "date-fns";
 
@@ -21,6 +22,7 @@ interface SlideCardProps {
   details?: PresentationDetails;
   onClick: () => void;
   onDelete: (slideId: string) => void;
+  onUpdate?: (slideId: string, updates: Partial<SlideData>) => void;
   slideIndex?: number;
 }
 
@@ -31,9 +33,18 @@ export const SlideCard = ({
   details,
   onClick, 
   onDelete,
+  onUpdate,
   slideIndex 
 }: SlideCardProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isEditingPrice, setIsEditingPrice] = useState(false);
+  const [editedPriceText, setEditedPriceText] = useState(slide.customPriceText || '');
+
+  // Reset price editing state when slide changes
+  useEffect(() => {
+    setIsEditingPrice(false);
+    setEditedPriceText(slide.customPriceText || '');
+  }, [slide.id, slide.customPriceText]);
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -45,11 +56,83 @@ export const SlideCard = ({
     setShowDeleteDialog(false);
   };
 
+  const handleEditPriceClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsEditingPrice(true);
+    if (!editedPriceText) {
+      // Initialize with current price text if no custom text exists
+      const currentPrice = slide.type === 'item' 
+        ? (slide.content as Item).clientPrice
+        : (slide.content as Hamper).items.reduce((sum, item) => sum + item.clientPrice, 0);
+      setEditedPriceText(`₹${currentPrice.toFixed(2)}`);
+    }
+  };
+
+  const handlePriceInputClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditedPriceText(e.target.value);
+  };
+
+  const handlePriceSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onUpdate) {
+      onUpdate(slide.id, { customPriceText: editedPriceText });
+    }
+    setIsEditingPrice(false);
+  };
+
   const renderPriceText = (amount: number) => {
     const mode = slide.priceDisplayMode ?? 'show';
     if (mode === 'hide') return null;
     if (mode === 'upon_request') return 'Price upon request';
+    if (slide.customPriceText) return slide.customPriceText;
     return `₹${amount.toFixed(2)}`;
+  };
+
+  const renderPriceElement = (priceText: string | null) => {
+    if (!priceText) return null;
+    
+    return (
+      <div className="relative group">
+        <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent flex items-center gap-2">
+          {isEditingPrice ? (
+            <>
+              <Input
+                value={editedPriceText}
+                onChange={handlePriceChange}
+                onClick={handlePriceInputClick}
+                className="w-40 text-2xl font-bold text-foreground bg-background"
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handlePriceSave}
+                className="h-8 w-8"
+              >
+                <Check className="h-4 w-4" />
+              </Button>
+            </>
+          ) : (
+            <>
+              {priceText}
+              {onUpdate && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleEditPriceClick}
+                  className="opacity-0 group-hover:opacity-100 h-8 w-8 transition-opacity"
+                >
+                  <Edit2 className="h-4 w-4" />
+                </Button>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    );
   };
 
   const renderSlideContent = () => {
@@ -84,7 +167,7 @@ export const SlideCard = ({
       );
     } else if (slide.type === 'item') {
       const item = slide.content as Item;
-      const priceText = renderPriceText(item.clientPriceWithGST);
+      const priceText = renderPriceText(item.clientPrice);
       return (
         <div className="w-full h-full flex flex-col">
           {/* Option Number */}
@@ -105,17 +188,13 @@ export const SlideCard = ({
             </div>
             
             {/* Item Price */}
-            {priceText && (
-              <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                {priceText}
-              </div>
-            )}
+            {renderPriceElement(priceText)}
           </div>
         </div>
       );
     } else {
       const hamper = slide.content as Hamper;
-      const total = hamper.items.reduce((sum, item) => sum + item.clientPriceWithGST, 0);
+      const total = hamper.items.reduce((sum, item) => sum + item.clientPrice, 0);
       const priceText = renderPriceText(total);
       return (
         <div className="w-full h-full flex flex-col">
@@ -160,9 +239,7 @@ export const SlideCard = ({
             {(slide.priceDisplayMode ?? 'show') !== 'hide' && (
               <div className="space-y-2 text-center">
                 <p className="text-sm text-muted-foreground">Total Value</p>
-                <p className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                  {priceText}
-                </p>
+                {renderPriceElement(priceText)}
               </div>
             )}
           </div>

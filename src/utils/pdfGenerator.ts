@@ -377,7 +377,9 @@ const renderItemSlide = async (
   // Item price
   const mode = slide?.priceDisplayMode ?? 'show';
   if (mode !== 'hide') {
-    const priceText = mode === 'upon_request' ? 'Price upon request' : `₹${item.clientPriceWithGST.toFixed(2)}`;
+    const priceText = mode === 'upon_request' 
+      ? 'Price upon request' 
+      : slide.customPriceText || `₹${item.clientPrice.toFixed(2)}`;
     renderText(ctx, priceText, centerX, pageHeight - margin - (40 * 3.78), {
       fontSize: 8 * 3.78,
       color: '#663399',
@@ -537,8 +539,10 @@ const renderHamperSlide = async (
   // Total price
   const mode = slide?.priceDisplayMode ?? 'show';
   if (mode !== 'hide') {
-    const totalPrice = hamper.items.reduce((sum, item) => sum + item.clientPriceWithGST, 0);
-    const priceText = mode === 'upon_request' ? 'Price upon request' : `₹${totalPrice.toFixed(2)}`;
+    const totalPrice = hamper.items.reduce((sum, item) => sum + item.clientPrice, 0);
+    const priceText = mode === 'upon_request' 
+      ? 'Price upon request' 
+      : slide.customPriceText || `₹${totalPrice.toFixed(2)}`;
     renderText(ctx, 'Total Value', centerX, currentY, {
       fontSize: 8 * 3.78,
       color: '#808080',

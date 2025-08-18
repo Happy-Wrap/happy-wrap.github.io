@@ -34,6 +34,7 @@ export interface SlideData {
   content: Item | Hamper | TemplateSlide;
   createdAt: Date;
   priceDisplayMode?: PriceDisplayMode;
+  customPriceText?: string;
 }
 
 export interface PresentationDetails {
