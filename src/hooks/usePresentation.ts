@@ -10,6 +10,7 @@ import {
   updateSlide,
   deleteSlide,
   updateDetails,
+  reorderSlides,
 } from "@/store/presentationSlice";
 
 export const usePresentation = () => {
@@ -34,5 +35,7 @@ export const usePresentation = () => {
     deleteSlide: (slideId: string) => dispatch(deleteSlide(slideId)),
     updateDetails: (updates: Partial<PresentationDetails>) => 
       dispatch(updateDetails(updates)),
+    reorderSlides: (oldIndex: number, newIndex: number) =>
+      dispatch(reorderSlides({ oldIndex, newIndex })),
   };
 };

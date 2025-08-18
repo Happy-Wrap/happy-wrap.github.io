@@ -73,6 +73,13 @@ const presentationSlice = createSlice({
         ...action.payload
       };
     },
+    reorderSlides: (state, action: PayloadAction<{ oldIndex: number; newIndex: number }>) => {
+      const { oldIndex, newIndex } = action.payload;
+      const slides = [...state.presentation.slides];
+      const [movedSlide] = slides.splice(oldIndex, 1);
+      slides.splice(newIndex, 0, movedSlide);
+      state.presentation.slides = slides;
+    },
   },
 });
 
@@ -82,6 +89,7 @@ export const {
   selectSlide, 
   updateSlide, 
   deleteSlide,
-  updateDetails 
+  updateDetails,
+  reorderSlides
 } = presentationSlice.actions;
 export default presentationSlice.reducer; 

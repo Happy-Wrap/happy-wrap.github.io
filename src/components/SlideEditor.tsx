@@ -1,12 +1,25 @@
-import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Plus } from "lucide-react";
-import { SlideData, SlideType, PresentationDetails } from "@/types/presentation";
+import { SlideData, PresentationDetails } from "@/types/presentation";
 import { SlideForm } from "./SlideForm";
-import { cn } from "@/lib/utils";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { PresentationDetails as PresentationDetailsForm } from "./PresentationDetails";
+import { PresentationDetails as PresentationDetailsComponent } from "./PresentationDetails";
+import { DraggableSlideItem } from "./DraggableSlideItem";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 interface SlideEditorProps {
   slides: SlideData[];
@@ -16,6 +29,7 @@ interface SlideEditorProps {
   onSelectSlide: (slideId: string) => void;
   onUpdateSlide: (slideId: string, updates: Partial<SlideData>) => void;
   onUpdateDetails: (updates: Partial<PresentationDetails>) => void;
+  onReorderSlides: (oldIndex: number, newIndex: number) => void;
 }
 
 export const SlideEditor = ({
@@ -26,109 +40,99 @@ export const SlideEditor = ({
   onSelectSlide,
   onUpdateSlide,
   onUpdateDetails,
+  onReorderSlides,
 }: SlideEditorProps) => {
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      const oldIndex = slides.findIndex((slide) => slide.id === active.id);
+      const newIndex = slides.findIndex((slide) => slide.id === over.id);
+      onReorderSlides(oldIndex, newIndex);
+    }
+  };
+
   const activeSlide = slides.find(slide => slide.id === activeSlideId);
-  const [activeTab, setActiveTab] = useState<string>("details");
 
   return (
-    <div className="h-full bg-presentation-bg border-r border-border overflow-y-auto">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <div className="p-6 pb-2">
-          <TabsList className="grid w-full grid-cols-2 bg-muted/20">
-            <TabsTrigger 
-              value="details" 
-              className="data-[state=active]:bg-gradient-primary data-[state=active]:text-white"
+    <Tabs defaultValue="slides" className="h-full">
+      <div className="px-6 py-3 border-b">
+        <TabsList className="w-full">
+          <TabsTrigger value="slides" className="flex-1">Slides</TabsTrigger>
+          <TabsTrigger value="details" className="flex-1">Details</TabsTrigger>
+        </TabsList>
+      </div>
+
+      <TabsContent value="slides" className="mt-0">
+        <div className="p-6 space-y-6">
+          {/* Header */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              Slide Editor
+            </h2>
+            <Button 
+              onClick={onAddSlide}
+              className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
             >
-              Details
-            </TabsTrigger>
-            <TabsTrigger 
-              value="slides"
-              className="data-[state=active]:bg-gradient-primary data-[state=active]:text-white"
-            >
-              Slides
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
-        <TabsContent value="slides" className="mt-0">
-          <div className="p-6 space-y-6">
-            {/* Header */}
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                Slide Editor
-              </h2>
-              <Button 
-                onClick={onAddSlide}
-                className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add New Slide
-              </Button>
-            </div>
-
-            {/* Slides List */}
-            <div className="space-y-3">
-              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                Slides ({slides.length})
-              </h3>
-              {slides.map((slide, index) => (
-                <Card
-                  key={slide.id}
-                  className={cn(
-                    "p-4 cursor-pointer transition-all duration-200 hover:shadow-soft",
-                    activeSlideId === slide.id 
-                      ? "ring-2 ring-presentation-primary bg-gradient-subtle" 
-                      : "hover:bg-muted/50"
-                  )}
-                  onClick={() => onSelectSlide(slide.id)}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">Slide {index + 1}</p>
-                      <p className="text-sm text-muted-foreground capitalize">
-                        {slide.type}
-                      </p>
-                    </div>
-                    <div className={cn(
-                      "w-3 h-3 rounded-full",
-                      slide.type === 'item' ? "bg-presentation-primary" : "bg-presentation-accent"
-                    )} />
-                  </div>
-                </Card>
-              ))}
-              
-              {slides.length === 0 && (
-                <Card className="p-8 text-center">
-                  <p className="text-muted-foreground">No slides yet</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Click "Add New Slide" to get started
-                  </p>
-                </Card>
-              )}
-            </div>
-
-            {/* Slide Form */}
-            {activeSlide && (
-              <div className="space-y-4">
-                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                  Edit Slide
-                </h3>
-                <SlideForm
-                  slide={activeSlide}
-                  onUpdate={(updates) => onUpdateSlide(activeSlide.id, updates)}
-                />
-              </div>
-            )}
+              <Plus className="w-4 h-4 mr-2" />
+              Add New Slide
+            </Button>
           </div>
-        </TabsContent>
 
-        <TabsContent value="details" className="mt-0">
-          <PresentationDetailsForm
+          {/* Slides List */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+              Slides ({slides.length})
+            </h3>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={slides.map(slide => slide.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-2">
+                  {slides.map((slide, index) => (
+                    <DraggableSlideItem
+                      key={slide.id}
+                      slide={slide}
+                      index={index}
+                      isActive={slide.id === activeSlideId}
+                      onClick={() => onSelectSlide(slide.id)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          </div>
+
+          {/* Slide Form */}
+          {activeSlide && (
+            <SlideForm
+              slide={activeSlide}
+              onUpdate={(updates) => onUpdateSlide(activeSlide.id, updates)}
+            />
+          )}
+        </div>
+      </TabsContent>
+
+      <TabsContent value="details">
+        <div className="p-6">
+          <PresentationDetailsComponent
             details={details}
             onUpdate={onUpdateDetails}
           />
-        </TabsContent>
-      </Tabs>
-    </div>
+        </div>
+      </TabsContent>
+    </Tabs>
   );
 };

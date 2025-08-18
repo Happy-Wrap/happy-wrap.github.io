@@ -9,7 +9,8 @@ const Index = () => {
     selectSlide, 
     updateSlide,
     deleteSlide,
-    updateDetails
+    updateDetails,
+    reorderSlides
   } = usePresentation();
 
   return (
@@ -34,6 +35,7 @@ const Index = () => {
             onSelectSlide={selectSlide}
             onUpdateSlide={updateSlide}
             onUpdateDetails={updateDetails}
+            onReorderSlides={reorderSlides}
           />
         </div>
 
