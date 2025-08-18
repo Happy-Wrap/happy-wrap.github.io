@@ -84,7 +84,7 @@ export const SlideCard = ({
       );
     } else if (slide.type === 'item') {
       const item = slide.content as Item;
-      const priceText = renderPriceText(item.price);
+      const priceText = renderPriceText(item.clientPriceWithGST);
       return (
         <div className="w-full h-full flex flex-col">
           {/* Option Number */}
@@ -115,7 +115,7 @@ export const SlideCard = ({
       );
     } else {
       const hamper = slide.content as Hamper;
-      const total = hamper.items.reduce((sum, item) => sum + item.price, 0);
+      const total = hamper.items.reduce((sum, item) => sum + item.clientPriceWithGST, 0);
       const priceText = renderPriceText(total);
       return (
         <div className="w-full h-full flex flex-col">

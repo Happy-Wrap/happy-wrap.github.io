@@ -24,7 +24,7 @@ const initialState: PresentationState = {
       remarks: ''
     }
   },
-  defaultItem: { id: '', name: '', price: 0, imageUrl: '' },
+  defaultItem: { id: '', name: '', mrp: 0, hwCost: 0, hwWithGST: 0, clientPrice: 0, clientPriceWithGST: 0, priceTag: '', imageUrl: '' },
 };
 
 const presentationSlice = createSlice({

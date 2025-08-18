@@ -1,7 +1,12 @@
 export interface Item {
   id: string;
   name: string;
-  price: number;
+  mrp: number;
+  hwCost: number;
+  hwWithGST: number;
+  clientPrice: number;
+  clientPriceWithGST: number;
+  priceTag: string;
   imageUrl: string;
   category?: string;
   subCategory?: string;

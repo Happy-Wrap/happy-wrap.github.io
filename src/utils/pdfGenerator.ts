@@ -52,10 +52,9 @@ const formatCurrency = (amount: number | string | undefined): string => {
 // Helper function to create and setup a canvas for rendering
 const createCanvas = (width: number, height: number): HTMLCanvasElement => {
   const canvas = document.createElement('canvas');
-  canvas.width = width * 2; // 2x for better resolution
-  canvas.height = height * 2;
+  canvas.width = width; // Remove the 2x scaling
+  canvas.height = height;
   const ctx = canvas.getContext('2d')!;
-  ctx.scale(2, 2); // Scale up for better resolution
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, width, height);
   return canvas;
@@ -172,7 +171,7 @@ const renderTemplateSlide = async (
   pageHeight: number
 ): Promise<void> => {
   try {
-    const canvas = createCanvas(pageWidth , pageHeight );
+    const canvas = createCanvas(pageWidth, pageHeight);
     const ctx = canvas.getContext('2d')!;
 
     // Add template background image
@@ -185,22 +184,28 @@ const renderTemplateSlide = async (
       img.onerror = reject;
     });
 
+    // Fill white background first
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, pageWidth, pageHeight);
+
+    // Draw image to fit the page while maintaining aspect ratio
     const imageRatio = img.width / img.height;
     const pageRatio = pageWidth / pageHeight;
     
-    let finalWidth = pageWidth * 3.78;
-    let finalHeight = pageHeight * 3.78;
+    let drawWidth = pageWidth;
+    let drawHeight = pageHeight;
+    let x = 0;
+    let y = 0;
     
     if (imageRatio > pageRatio) {
-      finalHeight = (pageWidth * 3.78) / imageRatio;
+      drawHeight = pageWidth / imageRatio;
+      y = (pageHeight - drawHeight) / 2;
     } else {
-      finalWidth = (pageHeight * 3.78) * imageRatio;
+      drawWidth = pageHeight * imageRatio;
+      x = (pageWidth - drawWidth) / 2;
     }
     
-    const x = ((pageWidth * 3.78) - finalWidth) / 2;
-    const y = ((pageHeight * 3.78) - finalHeight) / 2;
-    
-    ctx.drawImage(img, 0, 0, pageWidth, pageHeight);
+    ctx.drawImage(img, x, y, drawWidth, drawHeight);
 
     // If this is a requirements slide, add the content
     if (template.isRequirementsSlide && template.details) {
@@ -278,7 +283,11 @@ const renderItemSlide = async (
   const centerX = pageWidth / 2;
   const centerY = pageHeight / 2;
 
-  // First add the option template background
+  // Fill white background first
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, pageWidth, pageHeight);
+
+  // Add the option template background
   try {
     const bgImg = new Image();
     bgImg.crossOrigin = 'anonymous';
@@ -289,7 +298,24 @@ const renderItemSlide = async (
       bgImg.onerror = reject;
     });
 
-    ctx.drawImage(bgImg, 0, 0, pageWidth, pageHeight);
+    // Draw background image to fit the page while maintaining aspect ratio
+    const imageRatio = bgImg.width / bgImg.height;
+    const pageRatio = pageWidth / pageHeight;
+    
+    let drawWidth = pageWidth;
+    let drawHeight = pageHeight;
+    let x = 0;
+    let y = 0;
+    
+    if (imageRatio > pageRatio) {
+      drawHeight = pageWidth / imageRatio;
+      y = (pageHeight - drawHeight) / 2;
+    } else {
+      drawWidth = pageHeight * imageRatio;
+      x = (pageWidth - drawWidth) / 2;
+    }
+    
+    ctx.drawImage(bgImg, x, y, drawWidth, drawHeight);
   } catch (error) {
     console.warn('Could not add option template background:', error);
   }
@@ -351,7 +377,7 @@ const renderItemSlide = async (
   // Item price
   const mode = slide?.priceDisplayMode ?? 'show';
   if (mode !== 'hide') {
-    const priceText = mode === 'upon_request' ? 'Price upon request' : `₹${item.price.toFixed(2)}`;
+    const priceText = mode === 'upon_request' ? 'Price upon request' : `₹${item.clientPriceWithGST.toFixed(2)}`;
     renderText(ctx, priceText, centerX, pageHeight - margin - (40 * 3.78), {
       fontSize: 8 * 3.78,
       color: '#663399',
@@ -375,7 +401,11 @@ const renderHamperSlide = async (
   const centerX = pageWidth / 2;
   const centerY = pageHeight / 2;
 
-  // First add the option template background
+  // Fill white background first
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, pageWidth, pageHeight);
+
+  // Add the option template background
   try {
     const bgImg = new Image();
     bgImg.crossOrigin = 'anonymous';
@@ -386,7 +416,24 @@ const renderHamperSlide = async (
       bgImg.onerror = reject;
     });
 
-    ctx.drawImage(bgImg, 0, 0, pageWidth, pageHeight);
+    // Draw background image to fit the page while maintaining aspect ratio
+    const imageRatio = bgImg.width / bgImg.height;
+    const pageRatio = pageWidth / pageHeight;
+    
+    let drawWidth = pageWidth;
+    let drawHeight = pageHeight;
+    let x = 0;
+    let y = 0;
+    
+    if (imageRatio > pageRatio) {
+      drawHeight = pageWidth / imageRatio;
+      y = (pageHeight - drawHeight) / 2;
+    } else {
+      drawWidth = pageHeight * imageRatio;
+      x = (pageWidth - drawWidth) / 2;
+    }
+    
+    ctx.drawImage(bgImg, x, y, drawWidth, drawHeight);
   } catch (error) {
     console.warn('Could not add option template background:', error);
   }
@@ -490,7 +537,7 @@ const renderHamperSlide = async (
   // Total price
   const mode = slide?.priceDisplayMode ?? 'show';
   if (mode !== 'hide') {
-    const totalPrice = hamper.items.reduce((sum, item) => sum + item.price, 0);
+    const totalPrice = hamper.items.reduce((sum, item) => sum + item.clientPriceWithGST, 0);
     const priceText = mode === 'upon_request' ? 'Price upon request' : `₹${totalPrice.toFixed(2)}`;
     renderText(ctx, 'Total Value', centerX, currentY, {
       fontSize: 8 * 3.78,
