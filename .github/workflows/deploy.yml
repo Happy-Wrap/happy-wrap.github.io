@@ -40,6 +40,7 @@ jobs:
       - name: Build
         env:
           VITE_GOOGLE_API_KEY: ${{ secrets.VITE_GOOGLE_API_KEY }}
+          VITE_GOOGLE_SERVICE_ACCOUNT: ${{ secrets.VITE_GOOGLE_SERVICE_ACCOUNT }}
         run: npm run build
       - name: Setup Pages
         uses: actions/configure-pages@v5
