@@ -175,43 +175,51 @@ export const SlideCard = ({
     <>
       <div 
         className={`
-          relative rounded-lg overflow-hidden transition-all duration-200 h-full
+          relative rounded-lg overflow-hidden transition-all duration-200 h-full group
           ${isActive ? 'ring-2 ring-primary' : 'hover:ring-2 hover:ring-primary/50'}
           ${isPreview ? 'aspect-[16/9] bg-white' : 'aspect-[4/3] bg-card'}
         `}
         onClick={onClick}
       >
-        {slide.type === 'template' && !(slide.content as TemplateSlide).isRequirementsSlide ? (
-          <img 
-            src={(slide.content as TemplateSlide).imageUrl} 
-            alt="Template Slide"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        ) : (
-          <div className="h-full">
-            {/* Add background image for non-template slides and requirements slide */}
+        <div className="relative h-full">
+          {slide.type === 'template' && !(slide.content as TemplateSlide).isRequirementsSlide ? (
             <img 
-              src="/assets/slides/option-template.png" 
-              alt="Slide Background"
+              src={(slide.content as TemplateSlide).imageUrl} 
+              alt="Template Slide"
               className="absolute inset-0 w-full h-full object-cover"
             />
-            <div className="relative z-10 h-full">
-              {renderSlideContent()}
-            </div>
-          </div>
-        )}
+          ) : (
+            <>
+              {/* Background image */}
+              <img 
+                src="/assets/slides/option-template.png" 
+                alt="Slide Background"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="relative z-10 h-full">
+                {renderSlideContent()}
+              </div>
+            </>
+          )}
 
-        {/* Delete Button - Only show for non-template slides */}
-        {!isPreview && slide.type !== 'template' && (
-          <Button
-            variant="destructive"
-            size="icon"
-            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={handleDelete}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        )}
+          {/* Delete Button - Only show for non-template slides */}
+          {slide.type !== 'template' && (
+            <div className="absolute inset-0 z-30 pointer-events-none">
+              <Button
+                variant="destructive"
+                size="icon"
+                className={`
+                  absolute top-2 right-2 transition-opacity pointer-events-auto
+                  ${isPreview ? 'opacity-0 hover:opacity-100' : 'opacity-0 group-hover:opacity-100'}
+                  ${isActive ? 'opacity-100' : ''}
+                `}
+                onClick={handleDelete}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
